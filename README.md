@@ -15,6 +15,65 @@
 | `beta/` | 第 8 章「概率论基础」试点：样式源 `_style.css` / `_app.js`、构建脚本 `_build.py`、插图片段 `figs/`、制图规划与成本清单。成品 HTML 与教材原文片段**不入库**（含第三方教材的逐句翻译正文，见 `.gitignore`），在本地用你自己的材料生成 |
 | `参考教材 报告/` | 参考教材的图文设计分析，用来提炼选图与排版规则。**仅本地留存、不入库**（含第三方教材截图，见 `.gitignore`） |
 
+## 安装
+
+两个 skill 都是纯文件形式（`SKILL.md` + 参考文档 + 脚本），复制到 agent 的技能目录即可，没有编译与打包步骤。
+
+### 1. 取到本地
+
+```bash
+git clone git@github.com:Dorothy-Haitianxia/dorothy-learn-skills.git
+cd dorothy-learn-skills
+```
+
+### 2. 复制到技能目录
+
+```bash
+# macOS / Linux
+mkdir -p ~/.agents/skills
+cp -r skills/dorothy-html skills/dorothy-picture ~/.agents/skills/
+```
+
+```powershell
+# Windows PowerShell
+New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+Copy-Item -Recurse -Force .\skills\dorothy-html, .\skills\dorothy-picture "$HOME\.agents\skills\"
+```
+
+目录名必须与 `SKILL.md` 里 frontmatter 的 `name` 一致（`dorothy-html` / `dorothy-picture`）。
+
+### 3. 装渲染依赖（只有 dorothy-picture 需要）
+
+`dorothy-picture` 的「渲染成 PNG 亲眼核对」这一步靠 `@resvg/resvg-js`——纯本地预编译包，不需要系统级图形库：
+
+```bash
+cd ~/.agents/skills/dorothy-picture
+pnpm install --ignore-scripts
+```
+
+不做渲染核对也能用，`check_figure.py` 等校验脚本不依赖它。
+
+### 4. 验证
+
+```bash
+# 模板回归（应输出 OK）
+python skills/dorothy-html/scripts/check_note.py skills/dorothy-html/assets/note-template.html
+
+# 脚本语法
+python -c "import py_compile; py_compile.compile('skills/dorothy-picture/scripts/lib/figlib.py', doraise=True)"
+node --check skills/dorothy-picture/scripts/render_fig.js
+```
+
+### 依赖一览
+
+| 依赖 | 用在哪 | 是否必需 |
+|---|---|---|
+| Python 3.9+（只用标准库） | 全部校验与生成脚本 | 是 |
+| Node.js + pnpm | `render_fig.js` 渲染 PNG 核对 | 仅在渲染核对时需要 |
+| `@resvg/resvg-js` | 同上 | 随 `pnpm install` 安装 |
+
+装好后**重启 agent 会话**，skill 才会出现在技能目录里。
+
 ---
 
 # 知识笔记 HTML 生成 Skill（dorothy-html）
