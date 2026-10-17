@@ -1,0 +1,85 @@
+<figure class="fig" id="fig-10-poisson-live">
+  <svg id="poiSvg" viewBox="0 0 660 300" role="img" aria-label="二项分布 B(n, 2/n) 的概率柱与 Poisson(2) 极限点对照；拖动滑块改变 n，柱形逐步逼近极限点">
+    <title>图 10 · n 增大时二项分布如何逼近 Poisson 极限</title>
+    <line class="f-axis" x1="60" y1="252" x2="620" y2="252"/>
+    <g data-bars="1">
+      <rect class="f-hl" data-bar="0" x="67.0" y="172.6" width="34" height="79.4"/>
+      <rect class="f-hl" data-bar="1" x="131.0" y="75.5" width="34" height="176.5"/>
+      <rect class="f-hl" data-bar="2" x="195.0" y="65.7" width="34" height="186.3"/>
+      <rect class="f-hl" data-bar="3" x="259.0" y="127.8" width="34" height="124.2"/>
+      <rect class="f-hl" data-bar="4" x="323.0" y="193.3" width="34" height="58.7"/>
+      <rect class="f-hl" data-bar="5" x="387.0" y="231.1" width="34" height="20.9"/>
+      <rect class="f-hl" data-bar="6" x="451.0" y="246.2" width="34" height="5.8"/>
+      <rect class="f-hl" data-bar="7" x="515.0" y="250.7" width="34" height="1.3"/>
+      <rect class="f-hl" data-bar="8" x="579.0" y="251.8" width="34" height="0.2"/>
+    </g>
+    <path class="f-rule-dash" d="M84.0 163.6 L148.0 75.2 L212.0 75.2 L276.0 134.1 L340.0 193.1 L404.0 228.4 L468.0 244.1 L532.0 249.8 L596.0 251.4" fill="none"/>
+    <circle class="f-dot--acc" cx="84.0" cy="163.6" r="2.8"/>
+    <circle class="f-dot--acc" cx="148.0" cy="75.2" r="2.8"/>
+    <circle class="f-dot--acc" cx="212.0" cy="75.2" r="2.8"/>
+    <circle class="f-dot--acc" cx="276.0" cy="134.1" r="2.8"/>
+    <circle class="f-dot--acc" cx="340.0" cy="193.1" r="2.8"/>
+    <circle class="f-dot--acc" cx="404.0" cy="228.4" r="2.8"/>
+    <circle class="f-dot--acc" cx="468.0" cy="244.1" r="2.8"/>
+    <circle class="f-dot--acc" cx="532.0" cy="249.8" r="2.8"/>
+    <circle class="f-dot--acc" cx="596.0" cy="251.4" r="2.8"/>
+    <text class="t-lab" x="84.0" y="270" text-anchor="middle" font-size="11">0</text>
+    <text class="t-lab" x="148.0" y="270" text-anchor="middle" font-size="11">1</text>
+    <text class="t-lab" x="212.0" y="270" text-anchor="middle" font-size="11">2</text>
+    <text class="t-lab" x="276.0" y="270" text-anchor="middle" font-size="11">3</text>
+    <text class="t-lab" x="340.0" y="270" text-anchor="middle" font-size="11">4</text>
+    <text class="t-lab" x="404.0" y="270" text-anchor="middle" font-size="11">5</text>
+    <text class="t-lab" x="468.0" y="270" text-anchor="middle" font-size="11">6</text>
+    <text class="t-lab" x="532.0" y="270" text-anchor="middle" font-size="11">7</text>
+    <text class="t-lab" x="596.0" y="270" text-anchor="middle" font-size="11">8</text>
+    <text class="t-lab" x="600" y="46" text-anchor="end" font-size="11">虚线 + 空心点 = Poisson(2)</text>
+    <text class="t-num t-halo" data-read="n" x="84" y="46" text-anchor="start" font-size="12.5">B(n, p)，n = 20，p = 0.10</text>
+    <text class="t-note" data-read="gap" x="60" y="286" text-anchor="start">MAX |BINOM − POISSON| = 0.006</text>
+    <text class="t-note" x="620" y="286" text-anchor="end">K = 取值个数 · np 恒为 2</text>
+  </svg>
+  <div class="fig__legend"><span><i class="sw sw--ink"></i>二项 B(n, 2/n)</span><span><i class="sw sw--acc"></i>Poisson(2) 极限</span></div>
+  <div class="fig__ctl" data-ctl="poisson">
+    <label>n <input type="range" min="5" max="100" value="20" data-act="n" aria-label="二项分布的试验次数 n，取值 5 到 100"></label>
+    <span data-hint>n 增大时柱高不整体变矮，而是形状稳定到虚线 —— 收敛的是形态，不是高度</span>
+  </div>
+  <figcaption>图 10 · 二项分布 B(n, 2/n) 随 n 增大逼近 Poisson(2)：拖动 n 看柱形逐步贴到虚线上（正文 §8.3 例 4）</figcaption>
+  <script>
+(function () {
+  var SVG = document.getElementById('poiSvg');
+  if (!SVG) return;
+  var X0 = 84, DX = 64, BASE = 252, TOP = 56, KMAX = 8, SCALE = 0.30;
+  function XS(k) { return X0 + k * DX; }
+  function YS(p) { return BASE - Math.min(p, SCALE) / SCALE * (BASE - TOP); }
+  function binom(n, k, p) {
+    var v = Math.pow(1 - p, n);
+    for (var i = 1; i <= k; i++) v = v * (n - i + 1) / i * p / (1 - p);
+    return v;
+  }
+  function fact(k) { var f = 1; for (var i = 2; i <= k; i++) f *= i; return f; }
+  function pois(k) { return Math.exp(-2) * Math.pow(2, k) / fact(k); }
+  var grp = SVG.querySelector('g[data-bars]');
+  var readN = SVG.querySelector('[data-read="n"]');
+  var readGap = SVG.querySelector('[data-read="gap"]');
+  function paint(n) {
+    var p = 2 / n, k, h, gap = 0, d;
+    while (grp.firstChild) grp.removeChild(grp.firstChild);
+    for (k = 0; k <= KMAX; k++) {
+      h = YS(binom(n, k, p));
+      d = document.createElementNS(SVG.namespaceURI, "rect");
+      d.setAttribute("class", "f-hl");
+      d.setAttribute("x", (XS(k) - 17).toFixed(1));
+      d.setAttribute("y", h.toFixed(1));
+      d.setAttribute("width", "34");
+      d.setAttribute("height", (BASE - h).toFixed(1));
+      grp.appendChild(d);
+      gap = Math.max(gap, Math.abs(binom(n, k, p) - pois(k)));
+    }
+    readN.textContent = "B(n, p)，n = " + n + "，p = " + p.toFixed(n > 50 ? 3 : 2);
+    readGap.textContent = "MAX |BINOM − POISSON| = " + gap.toFixed(3);
+  }
+  var inp = document.querySelector('[data-ctl="poisson"] input[data-act="n"]');
+  if (inp) inp.addEventListener("input", function () { paint(parseInt(inp.value, 10)); });
+  paint(20);
+})();
+  </script>
+</figure>

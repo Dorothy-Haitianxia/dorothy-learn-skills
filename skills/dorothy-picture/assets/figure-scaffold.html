@@ -1,0 +1,37 @@
+<!--
+  dorothy-picture · figure 片段骨架
+  用法：复制本文件为 figs/fig-<N>-<slug>.html，只替换内容，保留结构与类名。
+  硬约束（check_figure.py 会校验）：
+    · 图内只挂语义类：不写颜色字面量、不写 stroke= / fill=（颜色由宿主页样式表给）
+    · <svg> 必须有 role="img" + aria-label，并有 <title>
+    · 图内字号 ≥ 11px
+    · figcaption 逐字格式：图 N · 一句话说明（正文 §X.Y）
+    · 数据来源、示意参数、发散/截断都要写进图注
+-->
+<figure class="fig" id="fig-N-slug">
+  <svg viewBox="0 0 640 260" role="img" aria-label="（一句话说明这张图讲了什么，供读屏）">
+    <title>（同 aria-label）</title>
+
+    <!-- 1. 网格 / 坐标轴（可省） -->
+    <line class="f-axis f-fade" x1="60" y1="200" x2="600" y2="200"/>
+    <line class="f-grid f-fade" x1="60" y1="80" x2="600" y2="80"/>
+
+    <!-- 2. 主体：曲线 / 柱 / 区域 / 结构块（关键关系必须画出来，不能只用文字标签说明） -->
+    <path class="f-line f-line--acc" d="M60 180 L200 120 L340 90" fill="none" pathLength="1"/>
+
+    <!-- 3. 关键点 + 数值（数值用 t-num，t-halo 给光晕） -->
+    <circle class="f-dot f-dot--acc" cx="340" cy="90" r="3.4"/>
+    <text class="t-num t-halo f-fade" x="340" y="78" text-anchor="middle" font-size="12.5">0.61</text>
+
+    <!-- 4. 注记行：全大写、等宽，写清可数单位与示意参数 -->
+    <text class="t-note f-fade" x="320" y="238" text-anchor="middle">ONE HAIRLINE = ONE X-SLICE · 图中取 λ = 1 示意</text>
+  </svg>
+
+  <!-- 图例：只在有两种以上需要区分的系列时出现 -->
+  <div class="fig__legend">
+    <span><i class="sw sw--ink"></i>密度 p(x)</span>
+    <span><i class="sw sw--acc"></i>关键点 x = √3</span>
+  </div>
+
+  <figcaption>图 N · 一句话说明这张图在讲什么，并给正文出处（正文 §X.Y）</figcaption>
+</figure>

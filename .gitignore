@@ -1,0 +1,40 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+target/
+
+# 环境变量
+.env
+.env.local
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# IDE配置（根据实际情况增减）
+.vscode/
+.idea/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 本仓库工作区：工具链、下载缓存、临时验证产物（体积大，可重建）
+.work/
+.pnpm-store/
+.verify/
+.cassette-ref/
+
+# 参考教材原图（第三方教材截图，仅本地留存，不入库）
+参考教材 报告/
+
+# 教材衍生内容：第三方教材的逐句翻译正文与章末习题，仅本地留存
+beta/_source.html
+beta/_exercises.html
+beta/ch08-概率论基础*.html

@@ -1,0 +1,106 @@
+<figure class="fig" id="fig-8-bertrand-live">
+  <svg id="bertSvg" viewBox="0 0 660 362" role="img" aria-label="三个圆并排：同一条弦长阈值下，随机端点、随机半径、随机中点三种模型分别抽出不同的弦；每格固定标出理论概率，其下给出抽样得到的样本频率">
+    <title>图 8 · 随机作用在哪个对象上，决定了长弦的比例（正文 §8.1 弦长问题）</title>
+    <circle class="f-axis" fill="none" cx="120.0" cy="150.0" r="78.0"/>
+    <circle class="f-rule-dash" fill="none" cx="120.0" cy="150.0" r="39.0"/>
+    <line class="f-grid" x1="26.0" y1="150.0" x2="214.0" y2="150.0"/>
+    <path class="f-hl-edge" d="M40.3 196.0 A92 92 0 0 0 199.7 196.0" fill="none"/>
+    <text class="t-num t-halo f-fade" x="120.0" y="252.0" text-anchor="middle" font-size="11.5">120° 有利弧</text>
+    <g data-chords="随机端点"><line class="f-line f-line--acc" x1="175.6" y1="204.7" x2="105.7" y2="73.3"/><line class="f-line f-line--acc" x1="177.6" y1="97.4" x2="43.8" y2="133.3"/><line class="f-line" x1="44.4" y1="130.8" x2="93.7" y2="223.4"/></g>
+    <text class="t-lab f-fade" x="120.0" y="270.0" text-anchor="middle" font-size="12">随机端点</text>
+    <text class="t-num f-fade" x="120.0" y="288.0" text-anchor="middle" font-size="12.5">理论 1/3</text>
+    <text class="t-num f-fade" data-rate="随机端点" x="120.0" y="308.0" text-anchor="middle" font-size="12.5">样本 —</text>
+    <text class="t-note f-fade" data-count="随机端点" x="120.0" y="326.0" text-anchor="middle">N = 0</text>
+    <circle class="f-axis" fill="none" cx="330.0" cy="150.0" r="78.0"/>
+    <circle class="f-rule-dash" fill="none" cx="330.0" cy="150.0" r="39.0"/>
+    <line class="f-grid" x1="236.0" y1="150.0" x2="424.0" y2="150.0"/>
+    <g data-chords="随机半径"><line class="f-line f-line--acc" x1="407.9" y1="154.8" x2="268.9" y2="101.5"/><line class="f-line f-line--acc" x1="339.0" y1="72.5" x2="261.5" y2="187.4"/><line class="f-line" x1="260.3" y1="185.1" x2="358.3" y2="222.7"/></g>
+    <text class="t-lab f-fade" x="330.0" y="270.0" text-anchor="middle" font-size="12">随机半径</text>
+    <text class="t-num f-fade" x="330.0" y="288.0" text-anchor="middle" font-size="12.5">理论 1/2</text>
+    <text class="t-num f-fade" data-rate="随机半径" x="330.0" y="308.0" text-anchor="middle" font-size="12.5">样本 —</text>
+    <text class="t-note f-fade" data-count="随机半径" x="330.0" y="326.0" text-anchor="middle">N = 0</text>
+    <circle class="f-axis" fill="none" cx="540.0" cy="150.0" r="78.0"/>
+    <circle class="f-rule-dash" fill="none" cx="540.0" cy="150.0" r="39.0"/>
+    <line class="f-grid" x1="446.0" y1="150.0" x2="634.0" y2="150.0"/>
+    <g data-chords="随机中点"><line class="f-line f-line--acc" x1="601.9" y1="102.6" x2="462.1" y2="153.5"/><line class="f-line f-line--acc" x1="495.9" y1="85.6" x2="512.8" y2="223.1"/><line class="f-line" x1="510.4" y1="222.2" x2="609.0" y2="186.3"/></g>
+    <text class="t-lab f-fade" x="540.0" y="270.0" text-anchor="middle" font-size="12">随机中点</text>
+    <text class="t-num f-fade" x="540.0" y="288.0" text-anchor="middle" font-size="12.5">理论 1/4</text>
+    <text class="t-num f-fade" data-rate="随机中点" x="540.0" y="308.0" text-anchor="middle" font-size="12.5">样本 —</text>
+    <text class="t-note f-fade" data-count="随机中点" x="540.0" y="326.0" text-anchor="middle">N = 0</text>
+    <line class="f-bracket" x1="90" y1="24" x2="570" y2="24"/>
+    <text class="t-note f-fade" x="330" y="18" text-anchor="middle">DASHED CIRCLE = 临界弦中点的轨迹 · 弦长 = √3 R ⟺ 弦心距 = R/2 ⟺ 中点落在该圆上</text>
+  </svg>
+  <div class="fig__legend"><span><i class="sw sw--ink"></i>短弦</span><span><i class="sw sw--acc"></i>长弦（弦心距 &lt; R/2）</span><span>虚线橙圆 = 临界弦中点的轨迹 r = R/2</span><span>灰虚线弧 = 端点模型的有利弧</span></div>
+  <div class="fig__ctl" data-ctl="bertrand"><button type="button" data-act="one">抽 1 条</button><button type="button" data-act="fifty">抽 50 条</button><button type="button" data-act="reset">重置</button><span data-hint>三种模型各自的「随机」加在不同的对象上：端点 / 直径上的中点 / 圆内的中点</span></div>
+  <figcaption>图 8 · 同一个「随机取弦」，随机加在端点、直径还是圆内，长弦比例分别收敛到 1/3、1/2、1/4（正文 §8.1 弦长问题 · 图中 R 为示意半径）</figcaption>
+  <script>
+(function () {
+  var SVG = document.getElementById('bertSvg');
+  if (!SVG) return;
+  var R = 78, RB = 39, CY = 150;
+  var PANELS = [['随机端点', 120], ['随机半径', 330], ['随机中点', 540]];
+  var state = {};
+  PANELS.forEach(function (p) { state[p[0]] = { n: 0, long: 0 }; });
+
+  function el(name, attrs) {
+    var e = document.createElementNS(SVG.namespaceURI, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  // 三种模型各返回弦的两个端点
+  function chordEnds(model, cx) {
+    var a, b, d, half, th;
+    if (model === '随机端点') {
+      a = Math.random() * 2 * Math.PI; b = Math.random() * 2 * Math.PI;
+      return [cx + R * Math.cos(a), CY - R * Math.sin(a), cx + R * Math.cos(b), CY - R * Math.sin(b)];
+    }
+    if (model === '随机半径') {          // 中点在一条直径上均匀
+      th = Math.random() * Math.PI; d = Math.random() * R;
+    } else {                              // 随机中点：中点在圆内均匀
+      th = Math.random() * 2 * Math.PI; d = R * Math.sqrt(Math.random());
+    }
+    half = Math.sqrt(Math.max(R * R - d * d, 1));
+    var mx = cx + d * Math.cos(th), my = CY - d * Math.sin(th);
+    var ux = -Math.sin(th), uy = -Math.cos(th);
+    return [mx - half * ux, my - half * uy, mx + half * ux, my + half * uy];
+  }
+  function addChord(model, cx, animate) {
+    var e = chordEnds(model, cx);
+    var d = Math.hypot((e[0] + e[2]) / 2 - cx, (e[1] + e[3]) / 2 - CY);
+    var isLong = d < RB;
+    var ln = el('line', { x1: e[0].toFixed(1), y1: e[1].toFixed(1), x2: e[2].toFixed(1), y2: e[3].toFixed(1),
+                          'class': isLong ? 'f-line f-line--acc f-fade' : 'f-line f-fade' });
+    var g = SVG.querySelector('g[data-chords="' + model + '"]');
+    g.appendChild(ln);
+    var s = state[model]; s.n++; if (isLong) s.long++;
+    if (animate && g.childNodes.length > 60) g.removeChild(g.firstChild);
+  }
+  function paint(model) {
+    var s = state[model];
+    var rate = SVG.querySelector('[data-rate="' + model + '"]');
+    var cnt = SVG.querySelector('[data-count="' + model + '"]');
+    if (rate) rate.textContent = s.n ? ('样本 ' + (s.long / s.n).toFixed(3)) : '样本 —';
+    if (cnt) cnt.textContent = 'N = ' + s.n + ' · 长弦 ' + s.long;
+  }
+  function reset() {
+    PANELS.forEach(function (p) {
+      var g = SVG.querySelector('g[data-chords="' + p[0] + '"]');
+      while (g.firstChild) g.removeChild(g.firstChild);
+      state[p[0]] = { n: 0, long: 0 }; paint(p[0]);
+    });
+  }
+  document.querySelectorAll('[data-ctl] [data-act]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var act = btn.getAttribute('data-act');
+      if (act === 'reset') { reset(); return; }
+      var times = act === 'one' ? 1 : 50;
+      PANELS.forEach(function (p) {
+        for (var i = 0; i < times; i++) addChord(p[0], p[1], act === 'one');
+        paint(p[0]);
+      });
+    });
+  });
+  PANELS.forEach(function (p) { paint(p[0]); });
+})();
+</script>
+</figure>

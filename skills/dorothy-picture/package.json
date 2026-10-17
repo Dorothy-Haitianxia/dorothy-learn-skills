@@ -1,0 +1,10 @@
+{
+  "name": "dorothy-picture",
+  "private": true,
+  "version": "0.1.0",
+  "description": "dorothy-picture 的渲染核对依赖（@resvg/resvg-js：纯本地预编译 SVG 渲染器，无系统依赖）",
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "@resvg/resvg-js-win32-x64-msvc": "2.6.2"
+  }
+}
