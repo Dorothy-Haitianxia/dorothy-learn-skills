@@ -1,10 +1,12 @@
 # Dorothy Skills
 
-把课本的一章变成可读产物的两个 agent skill：**dorothy-html**（课本 → 单文件知识笔记 HTML）与 **dorothy-picture**（为这类页面画有教学任务的矢量插图）。
+两个 agent skill：**dorothy-html** 把课本的一章转成单文件的知识笔记 HTML，**dorothy-picture** 给这类页面画有教学任务的矢量插图。
 
-**English.** Two agent skills that turn a textbook chapter into something you can actually read. `dorothy-html` takes a chapter's Markdown (end-of-chapter exercises included) and emits a single self-contained HTML page — overview, a pan-and-zoom knowledge map, concept cards split into definitions / theorems / examples, common mistakes, and a quiz — with two runtime themes and a search over concept cards. `dorothy-picture` designs the figures that go inside such a page: an eight-stage pipeline running from "name the comprehension barrier" to a three-layer acceptance, emitting inline SVG whose colors come from the host page's CSS tokens, so every figure follows the theme for free. No frameworks, no build step, no network at runtime — the deliverable is a file, not a service.
+ps：本项目为肘击大肥鱼生成，是vibe coding的！
 
-**中文.** 两个 agent skill，把课本的一章变成真正能读的东西。`dorothy-html` 接收一章课本 Markdown（含章末习题），产出单文件、可直接双击打开的 HTML 知识笔记页——概览、可平移缩放的知识地图、按定义 / 定理 / 例子三分屏的概念卡、易错点、自测与习题，带双主题运行时切换与概念卡全局搜索。`dorothy-picture` 负责画这类页面里的插图：从「识别理解障碍」到「三层验收」的八阶段流程，输出内联 SVG，颜色只挂宿主页的 CSS 令牌，因此自动跟随主题；每张图先在离线复刻上核对数学，再渲染成 PNG 逐张过目。没有框架、没有构建步骤、运行时零网络请求——交付物是文件，不是服务。
+**English.** Two agent skills that turn a textbook chapter into something you can actually read. `dorothy-html` takes a chapter's Markdown (end-of-chapter exercises included) and emits a single self-contained HTML page: an overview, a pan-and-zoom knowledge map, concept cards split into definitions, theorems, and examples, common mistakes, and a quiz, plus two runtime themes and a search over the concept cards. `dorothy-picture` designs the figures that go inside such a page. It runs an eight-stage pipeline, from naming the comprehension barrier to a three-layer acceptance, and emits inline SVG whose colors come from the host page's CSS tokens, so every figure follows the theme for free. No frameworks, no build step, no network at runtime. The deliverable is a file, not a service.
+
+**中文.** 两个 agent skill，把课本的一章变成能读的东西。`dorothy-html` 接收一章课本 Markdown（含章末习题），产出一个单文件、双击就能打开的 HTML 知识笔记页：概览、可平移缩放的知识地图、按定义 / 定理 / 例子分成三块的概念卡、易错点、自测与习题，双主题可以在运行时切换，概念卡支持全局搜索。`dorothy-picture` 画这类页面里的插图。它走一条从「识别理解障碍」到「三层验收」的八阶段流程，输出内联 SVG，颜色只挂宿主页的 CSS 令牌，所以能自动跟随主题。每张图先在离线复刻上核对数学，再转成 PNG 逐张过目。没有框架，没有构建步骤，运行时也不联网。交付物是文件，不是服务。
 
 ## 仓库结构
 
@@ -12,12 +14,12 @@
 |---|---|
 | `skills/dorothy-html/` | 课本 → 单文件知识笔记 HTML。`SKILL.md`、模板 `assets/note-template.html`、`reference/`（设计规格、内容映射）、`scripts/`（自检 `check_note.py`、互引 `refs.py`、模板构建 `build_template.py`） |
 | `skills/dorothy-picture/` | 教学制图，被 dorothy-html 内联。`SKILL.md`、`reference/`（评估、选图范例、视觉文法、交互图、规划契约）、`assets/`、`scripts/`（图型库 `lib/figlib.py`、渲染核对 `render_fig.js`、机械校验 `check_figure.py` / `check_plan.py`、JS 抽取 `extract_js.py`） |
-| `beta/` | 第 8 章「概率论基础」试点：样式源 `_style.css` / `_app.js`、构建脚本 `_build.py`、插图片段 `figs/`、制图规划与成本清单。成品 HTML 与教材原文片段**不入库**（含第三方教材的逐句翻译正文，见 `.gitignore`），在本地用你自己的材料生成 |
+| `beta/` | 第 8 章「概率论基础」试点：样式源 `_style.css` / `_app.js`、构建脚本 `_build.py`、插图片段 `figs/`、制图规划与成本清单。成品 HTML 与教材原文片段**不入库**（含第三方教材的逐句翻译正文，见 `.gitignore`），需要的话用你自己的材料在本地生成 |
 | `参考教材 报告/` | 参考教材的图文设计分析，用来提炼选图与排版规则。**仅本地留存、不入库**（含第三方教材截图，见 `.gitignore`） |
 
 ## 安装
 
-两个 skill 都是纯文件形式（`SKILL.md` + 参考文档 + 脚本），复制到 agent 的技能目录即可，没有编译与打包步骤。
+两个 skill 都是纯文件（`SKILL.md`、参考文档、脚本），复制到 agent 的技能目录就能用，没有编译或打包步骤。
 
 ### 1. 取到本地
 
@@ -44,7 +46,7 @@ Copy-Item -Recurse -Force .\skills\dorothy-html, .\skills\dorothy-picture "$HOME
 
 ### 3. 装渲染依赖（只有 dorothy-picture 需要）
 
-`dorothy-picture` 的「渲染成 PNG 亲眼核对」这一步靠 `@resvg/resvg-js`——纯本地预编译包，不需要系统级图形库：
+`dorothy-picture` 里「渲染成 PNG 亲眼核对」这一步靠 `@resvg/resvg-js`。这是个纯本地的预编译包，不用装系统级图形库：
 
 ```bash
 cd ~/.agents/skills/dorothy-picture
@@ -78,11 +80,11 @@ node --check skills/dorothy-picture/scripts/render_fig.js
 
 # 知识笔记 HTML 生成 Skill（dorothy-html）
 
-把一章课本正文（含课本章末习题）生成一份**单文件、可直接在浏览器打开**的知识笔记页：宽屏翻页式（章节概览 → 知识地图 → 核心概念 → 易错点 → 自测与习题），带可平移缩放的知识地图、前置概念互引浮层、按 lieflat 结构的辅助插图。
+把一章课本正文（含章末习题）做成一份**单文件、直接用浏览器就能打开**的知识笔记页。版式是宽屏翻页式，从章节概览到知识地图、核心概念、易错点，最后是自测与习题。页内有可平移缩放的知识地图、点开前置概念的互引浮层，以及按 lieflat 结构排的辅助插图。
 
 ![孤星主题下的核心概念页：左侧留白给知识地图，右侧是正文与三格几何图](docs/screenshot-light.png)
 
-切到 NASA-punk 主题，同一页的配色与线条整体更换，图会跟着变色（下图中间的柱状图是可拖动 n 的交互图）：
+切到 NASA-punk 主题后，同一页的配色和线条整体换掉，图也跟着变色。下图中间的柱状图可以拖动 n。
 
 ![NASA-punk 主题下的同一页：机身配色、图表与滑块控件](docs/screenshot-nasapunk.png)
 
@@ -98,9 +100,8 @@ node --check skills/dorothy-picture/scripts/render_fig.js
 | `skills/dorothy-html/reference/content-mapping.md` | 输入 → 五页/卡片映射、**互引取词与守卫规则**、插图数据来源、统计口径、缺料写法 |
 | `skills/dorothy-html/scripts/check_note.py` | 产物自检：令牌化、无圆角阴影 emoji 外链、五页与翻页器、互引链接、浮层结构、插图配对、动画属性、出处行 |
 | `skills/dorothy-html/scripts/refs.py` | 互引引擎：别名表 + 左右守卫 + 偏移映射 + 行内标签边界扩展；`--file` 出审报告，`--apply` 写标记 |
-| `skills/dorothy-html/scripts/figures.py` | 三张插图的生成器（B1 rung bars / B2 hairline line / B3 hairline area），改数据即可复用 |
 | `skills/dorothy-html/scripts/build_template.py` | 模板构建脚本：把 beta 的样式与交互层搬进模板骨架 |
-| `beta/ch08-概率论基础.html` | 第 8 章试点成品（**不入库**，本地生成）。含 §8.3 课本章末习题 8.1–8.16；课本未给解答 → 标 `[待补充]`） |
+| `beta/ch08-概率论基础.html` | 第 8 章试点成品（**不入库**，本地生成）。含 §8.3 课本章末习题 8.1–8.16；课本没给解答，标 `[待补充]` |
 | `beta/_style.css` · `beta/_app.js` | 模板的唯一样式/交互源：`build_template.py` 把这两个文件原样写进模板（改样式改这里，不要直接改模板） |
 | `beta/_exercises.html` | 课本章末 16 道习题的卡片片段（题目照抄正文，由 `_build.py` 拼进末页）；**含教材内容，不入库** |
 | `beta/ch08-概率论基础_refs-review.md` | 该成品的 23 处互引清单（别名表、守卫表、每处上下文） |
@@ -130,11 +131,11 @@ Copy-Item -LiteralPath '<repo>\skills\dorothy-html' `
 & 'python' -c "import re,yaml,pathlib; t=pathlib.Path(r'<skills>\dorothy-html\SKILL.md').read_text(encoding='utf-8'); m=yaml.safe_load(re.match(r'^---\r?\n(.*?)\r?\n---\r?\n',t,re.S).group(1)); print(m['name'], len(m['description']), '字符')"
 ```
 
-**注意**：`description` 里若出现 ` #`（空格 + 井号），YAML 会当成注释把描述截断——写 frontmatter 时给它加双引号。这个坑实际踩过一次（描述只剩 29 个字符）。
+**注意**：`description` 里出现 ` #`（空格加井号）时，YAML 会当成注释，把后面的描述截断。写 frontmatter 时给它加上双引号。这个坑我们踩过一次，描述只剩 29 个字符。
 
 ## 用法
 
-1. 给出：该章课本正文 Markdown（课本章末习题通常就在正文末尾，随正文一起给）。本 skill 只处理课本材料，不接收笔记类输入。
+1. 提供该章课本正文的 Markdown。章末习题通常就在正文末尾，一起给过来就行。这个 skill 只处理课本材料，不收笔记类输入。
 2. 产出 `chXX-章节名.html`。
 3. 自检与互引审核：
 
@@ -145,7 +146,21 @@ $sk = "$HOME\.agents\skills\dorothy-html"      # 或工作区源码 skills\dorot
 & $py -X utf8 "$sk\scripts\check_note.py" '<产出.html>'
 & $py -X utf8 "$sk\scripts\refs.py" --file '<产出.html>'          # 先审
 & $py -X utf8 "$sk\scripts\refs.py" --file '<产出.html>' --apply --out '<产出-marked.html>'
+& $py -X utf8 "$sk\scripts\check_note.py" '<产出.html>' --plan '<产物>_figures-plan.md'   # 与制图清单对账
 ```
+
+## 两种构建：静态版与交互版
+
+`beta/_build.py` 接受一个可选参数：
+
+| 命令 | 产物 | 区别 |
+|---|---|---|
+| `python beta/_build.py`（等同 `classic`） | `beta/ch08-概率论基础.html` | 全部静态图：Bertrand 三格几何图、二项分布柱状图都是写死的 SVG |
+| `python beta/_build.py interactive` | `beta/ch08-概率论基础-交互版.html` | 原图 5 换成可拖动的三格动态图（交互版里编号为图 8），原图 2 换成可拖动 n 的二项逼近 Poisson，另加密度带拖拽与分布函数跳跃两张动态图 |
+
+反直觉的地方：交互版反而更小（约 306 KB 对 334 KB）。静态柱状图要写几千条 `<line>` 才画得出「一根横档 = 1% 概率」，动态图只存一份绘制代码，按参数重算。
+
+> 注意：`_build.py` 读的是本地的 `beta/_source.html` 与 `beta/_exercises.html`（含教材正文，不入库）。clone 下来直接跑会缺输入——这两个文件要用你自己的材料生成。
 
 ## 成品自检结果（ch08）
 
@@ -157,7 +172,7 @@ frontmatter     → name=dorothy-html，description 完整（PyYAML 一行校验
 
 ## 双主题：孤星 ⇄ NASA-punk（运行时切换）
 
-NASA-punk 已经**收进基础样式**、变成第二套令牌，不再是单独的构建变体：同一份 HTML 里两套主题，顶栏右上角切换，不重出文件。
+NASA-punk 已经**收进基础样式**，作为第二套令牌存在，不再是单独的构建变体。同一份 HTML 里装两套主题，在顶栏右上角切换，不用另出文件。
 
 | 位置 | 内容 |
 |---|---|
@@ -165,30 +180,28 @@ NASA-punk 已经**收进基础样式**、变成第二套令牌，不再是单独
 | `beta/_style.css` 的 `.np-chrome` | 装饰件常驻 DOM：孤星下 `display:none`（不占排布），NASA-punk 下 `display:contents` 并按 34ms 级联淡入 |
 | `beta/_app.js` 的主题模块 | `setTheme()`：加 `.is-theming` → 强制重排 → 换 `data-theme` → rAF 驱动百分比进度条 → 驻留 240ms 后淡出；`localStorage['dorothy:theme']` 记忆，`try/catch` 兜底 |
 
-**只改线条与配色**：主题块里没有任何 `font-family / font-size / letter-spacing / text-transform / font-style / line-height` 覆盖，字体沿用基础样式（Times New Roman + 霞鹜文楷 + NoteMath + Consolas）。回归验证：切换前的 NASA-punk 单主题产物与当前双主题产物的「核心概念 + 易错点」区段**逐字相同**（113506 字符），3 张插图与知识地图 SVG 也逐字相同。
+**只改线条和配色。** 主题块里没有任何字体相关的覆盖（`font-family`、`font-size`、`letter-spacing`、`text-transform`、`font-style`、`line-height` 都没有），字体沿用基础样式的 Times New Roman + 霞鹜文楷 + NoteMath + Consolas。回归验证过：切换前的 NASA-punk 单主题产物和现在的双主题产物，核心概念与易错点两段**逐字相同**（113506 字符），3 张插图与知识地图 SVG 也逐字相同。
 
-**令牌键名两套齐全**：主题块只许覆盖、不许新增键 —— NASA-punk 专用令牌（`--red` / `--s1..--s4` / `--rivet` / `--wear-*`）在基础 `:root` 里也留占位值，否则切回孤星会缺声明。`check_note.py` 会断言这一点。
-
-> 历史留档（已从仓库移除）：`beta/_skin-nasapunk.*` 与 `beta/ch08-概率论基础-nasapunk.html` 是**运行时切换之前**的单主题产物，已被上面这套取代。
+**令牌键名两套齐全。** 主题块只允许覆盖，不允许新增键。NASA-punk 专用的令牌（`--red`、`--s1..--s4`、`--rivet`、`--wear-*`）在基础 `:root` 里也留了占位值，否则切回孤星会缺声明。`check_note.py` 会断言这一点。
 
 # 教学制图 Skill（dorothy-picture）
 
-给数学与课本材料画**有教学任务**的矢量图。它不负责装饰：一张图要么替读者完成一次推理，要么不该存在。
+给数学与课本材料画**有教学任务**的矢量图。它不做装饰：一张图要么替读者完成一次推理，要么就不该存在。
 
 上面的截图里那两张图（三格几何图、二项分布逼近 Poisson 的柱状图）就是它生成的。
 
 ## 流程：从理解障碍出发
 
-不像常规的「先想画什么再想怎么画」，这里先把障碍说清楚：
+常规做法是先想画什么、再想怎么画。这里反过来，先把障碍说清楚：
 
-1. **提取知识点** —— 把一章拆成可独立讲授的知识单元
-2. **识别理解障碍** —— 逐个问：读者会在哪里卡住，卡的是什么
-3. **四维打分** —— 结构 / 过程 / 直观 / 辨析各 0–2 分；**任一维 = 2 或总分 ≥ 4** 才进入制图，否则明确写「不出图」及理由
-4. **六问闸门** —— 其中最关键的一问是「删掉这张图，读者会失去什么」
-5. **图示规格** —— 图型、尺寸比例、语义类、图注、alt、锚点
-6. **规格检查** —— `check_plan.py` 机械校验打分、八字段、状态机、锚点
-7. **实现** —— 写内联 SVG（图型库 `figlib.py` 提供几何图元与布局）
-8. **三层验收** —— 数学正确性 / 视觉表达 / 教学有效性**分开记**，不合并；层级不同，合并会让人用「好看」掩盖错误
+1. **提取知识点**：把一章拆成可独立讲授的知识单元
+2. **识别理解障碍**：逐个问读者会在哪里卡住，卡的是什么
+3. **四维打分**：结构 / 过程 / 直观 / 辨析各 0–2 分；**任一维 = 2 或总分 ≥ 4** 才进入制图，否则明确写「不出图」及理由
+4. **六问闸门**：其中最关键的一问是「删掉这张图，读者会失去什么」
+5. **图示规格**：图型、尺寸比例、语义类、图注、alt、锚点
+6. **规格检查**：`check_plan.py` 机械校验打分、八字段、状态机、锚点
+7. **实现**：写内联 SVG（图型库 `figlib.py` 提供几何图元与布局）
+8. **三层验收**：数学正确性、视觉表达、教学有效性**分开记**，不合并。三者层级不同，一合并就会让人用「好看」盖住错误
 
 ## 图型库
 
@@ -207,7 +220,7 @@ NASA-punk 已经**收进基础样式**、变成第二套令牌，不再是单独
 
 ## 硬约束
 
-- 图内**只挂语义类**，颜色一律走宿主页的 CSS 令牌 —— 于是图自动跟随页面的孤星 ⇄ NASA-punk 主题切换，零额外成本
+- 图内**只挂语义类**，颜色一律走宿主页的 CSS 令牌，因此能跟着页面在孤星和 NASA-punk 之间切换，不需要额外成本
 - 禁止装饰性配图，禁止以图代证
 - 生成后**必须渲染成 PNG 亲眼核对**：几何错位、元素重叠、标签压线这类问题，代码审查抓不到
 - 交互图另加一层运行时验收（自动化测不了，只能人工拖一遍）
@@ -249,7 +262,17 @@ python skills/dorothy-picture/scripts/check_plan.py beta/ch08_figures-plan.md --
 
 ## 与 dorothy-html 的关系
 
-dorothy-picture 不单独交付页面。它产出的 `figs/*.html` 由 dorothy-html 内联，图号、图注、alt 与正文引用由宿主页统一管理；两者共用同一套语义类名，登记在 [design-spec.md](skills/dorothy-html/reference/design-spec.md) 第十二节。
+dorothy-picture 不单独交付页面。它产出的 `figs/*.html` 由 dorothy-html 内联，图号、图注、alt 和正文里的引用都由宿主页统一管理。两者共用同一套语义类名，登记在 [design-spec.md](skills/dorothy-html/reference/design-spec.md) 第十二节。
+
+---
+
+## 协作与致谢
+
+**人类作者**：选题、找材料、定验收标准，逐条判断哪些产出留下、哪些扔掉。
+
+**AI 协作**：DeepSeek 参与两个 skill 的代码、参考文档与这份 README 的起草。所有产出（包括每一张图、每一条校验规则）都经人工看过才保留——这一版的制图流程之所以把「渲染成 PNG 亲眼核对」和「三层验收分开记」定成硬约束，就是被机器生成物坑过之后补上的。
+
+> 关于 GitHub 的 Contributors 面板：它只统计能映射到 GitHub 账号的提交作者，AI 没有账号，所以不会以头像的形式出现在那里。协作关系记在这一节。
 
 ---
 
