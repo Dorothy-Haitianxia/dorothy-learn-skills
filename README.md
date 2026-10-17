@@ -80,6 +80,14 @@ node --check skills/dorothy-picture/scripts/render_fig.js
 
 把一章课本正文（含课本章末习题）生成一份**单文件、可直接在浏览器打开**的知识笔记页：宽屏翻页式（章节概览 → 知识地图 → 核心概念 → 易错点 → 自测与习题），带可平移缩放的知识地图、前置概念互引浮层、按 lieflat 结构的辅助插图。
 
+![孤星主题下的核心概念页：左侧留白给知识地图，右侧是正文与三格几何图](docs/screenshot-light.png)
+
+切到 NASA-punk 主题，同一页的配色与线条整体更换，图会跟着变色（下图中间的柱状图是可拖动 n 的交互图）：
+
+![NASA-punk 主题下的同一页：机身配色、图表与滑块控件](docs/screenshot-nasapunk.png)
+
+> 截图中的正文与例题来自第三方教材，仅用于展示页面效果，仓库不含其全文。
+
 ## 交付物
 
 | 路径 | 说明 |
@@ -163,4 +171,86 @@ NASA-punk 已经**收进基础样式**、变成第二套令牌，不再是单独
 
 > 历史留档（已从仓库移除）：`beta/_skin-nasapunk.*` 与 `beta/ch08-概率论基础-nasapunk.html` 是**运行时切换之前**的单主题产物，已被上面这套取代。
 
+# 教学制图 Skill（dorothy-picture）
 
+给数学与课本材料画**有教学任务**的矢量图。它不负责装饰：一张图要么替读者完成一次推理，要么不该存在。
+
+上面的截图里那两张图（三格几何图、二项分布逼近 Poisson 的柱状图）就是它生成的。
+
+## 流程：从理解障碍出发
+
+不像常规的「先想画什么再想怎么画」，这里先把障碍说清楚：
+
+1. **提取知识点** —— 把一章拆成可独立讲授的知识单元
+2. **识别理解障碍** —— 逐个问：读者会在哪里卡住，卡的是什么
+3. **四维打分** —— 结构 / 过程 / 直观 / 辨析各 0–2 分；**任一维 = 2 或总分 ≥ 4** 才进入制图，否则明确写「不出图」及理由
+4. **六问闸门** —— 其中最关键的一问是「删掉这张图，读者会失去什么」
+5. **图示规格** —— 图型、尺寸比例、语义类、图注、alt、锚点
+6. **规格检查** —— `check_plan.py` 机械校验打分、八字段、状态机、锚点
+7. **实现** —— 写内联 SVG（图型库 `figlib.py` 提供几何图元与布局）
+8. **三层验收** —— 数学正确性 / 视觉表达 / 教学有效性**分开记**，不合并；层级不同，合并会让人用「好看」掩盖错误
+
+## 图型库
+
+六类「障碍图型」，每类对应一种理解障碍：
+
+| 障碍 | 图型 | 生成函数 |
+|---|---|---|
+| 不知道对象之间谁连谁 | 结构关系图 / 依赖图 | `objmap()` `depgraph()` |
+| 看不出过程分几步 | 分阶段图 | `stages()` |
+| 跟不上推理的每一步依据 | 证明流程图 | `proof()` |
+| 两个概念分不清 | 对照反例图 | `compare()` |
+| 概率与区间对不上 | 区间/事件图 | `axis()` |
+| 解析式画不出图形 | 几何直觉图 | `gcircle()` `garc()` `gchord()` `gpoly()` |
+
+另有复合图型：`chord_models()`（同一事件的不同随机模型并置）、`cdf_jumps()`（分布函数的跳跃与原子）、`marginal_joint_pair()`（边缘相同、联合不同）、`pushforward_pair()`（原像与推前测度），以及可拖动的交互图变体。
+
+## 硬约束
+
+- 图内**只挂语义类**，颜色一律走宿主页的 CSS 令牌 —— 于是图自动跟随页面的孤星 ⇄ NASA-punk 主题切换，零额外成本
+- 禁止装饰性配图，禁止以图代证
+- 生成后**必须渲染成 PNG 亲眼核对**：几何错位、元素重叠、标签压线这类问题，代码审查抓不到
+- 交互图另加一层运行时验收（自动化测不了，只能人工拖一遍）
+
+## 产物
+
+| 文件 | 内容 |
+|---|---|
+| `<产物>_figures-plan.md` | 制图规划清单：逐知识点打分、出图/不出图理由、八字段规格、三层验收记录 |
+| `<产物>_figures-cost.md` | 成本账：可复核的原始量（写入字符数、渲染轮次、返工次数）与换算口径 |
+| `figs/fig-*.html` | 自包含的 `<figure>` 片段，由 dorothy-html 内联进成品页 |
+
+## 工具
+
+| 脚本 | 作用 |
+|---|---|
+| `scripts/lib/figlib.py` | 图型库：几何图元、布局、六类障碍图型、数据图 |
+| `scripts/check_figure.py` | 片段校验：可访问性、图注格式、颜色字面量、字号、类名白名单、图元密度 |
+| `scripts/check_plan.py` | 清单校验：打分完整性、八字段、状态机、锚点与卡片对账 |
+| `scripts/render_fig.js` | 渲染 PNG：从宿主页抽 CSS 令牌、解析 `var()`、注入 `<style>` 后交给 `@resvg/resvg-js` |
+| `scripts/extract_js.py` | 抽出图内联脚本，交给 `node --check` 验语法 |
+
+## 用法
+
+```bash
+# 列出页面里的所有图
+node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08.html --list
+
+# 渲染某张图核对（可选 --theme nasapunk 看深色主题）
+node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08.html --id fig-5-chord --out out.png
+
+# 导出脱离宿主页的自包含 SVG（token 已烘焙成具体色值）
+node skills/dorothy-picture/scripts/render_fig.js --figure beta/figs/fig-5-chord.html --css beta/_style.css --out fig.svg --bake
+
+# 校验
+python skills/dorothy-picture/scripts/check_figure.py beta/figs/*.html
+python skills/dorothy-picture/scripts/check_plan.py beta/ch08_figures-plan.md --html beta/ch08.html
+```
+
+## 与 dorothy-html 的关系
+
+dorothy-picture 不单独交付页面。它产出的 `figs/*.html` 由 dorothy-html 内联，图号、图注、alt 与正文引用由宿主页统一管理；两者共用同一套语义类名，登记在 [design-spec.md](skills/dorothy-html/reference/design-spec.md) 第十二节。
+
+---
+
+MIT License · 见 [LICENSE](LICENSE)
