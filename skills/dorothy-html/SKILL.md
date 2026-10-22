@@ -25,7 +25,7 @@ description: "全局 skill：把任意科目的某章课本正文（含课本章
 
 - 文件名 `chXX-章节名.html`，放在科目工作区。
 - **单文件**：CSS/JS 内联，不引外部图片、字体、脚本；字体只用系统字体栈 + 本机 `local()` 兜底。
-- 模板：`assets/note-template.html`。复制它，只改 `<body>` 内容；`<style>` 的令牌区与 `<script>` 的交互层照用。
+- 模板：`assets/note-template.html`。复制它，只改 `<body>` 内容；`<style>` 的令牌区与 `<script>` 的交互层照用。模板由 `scripts/build_template.py` 从工作目录的 `beta/_style.css` 与 `beta/_app.js` 生成（教学层样式已并入 `beta/_style.css`，所以模板默认就带 `.tk-*` 全套）。
 
 ## 三、页面结构（五页 + 一个浮层）
 
@@ -84,7 +84,7 @@ description: "全局 skill：把任意科目的某章课本正文（含课本章
 
 ## 六、插图：委托 `dorothy-picture`
 
-**本 skill 不自己做图。** 插图统一交给全局 skill `dorothy-picture`：它先对六类内容源逐条做制图评估（结论落盘，不出图也要写理由），再按八字段规划、用令牌化内联 SVG 生成、渲染成 PNG 亲眼核对后交付。本 skill 只负责三件事：给它输入、把产出插到锚点、把图文闭环写进正文。
+**本 skill 不自己做图。** 插图统一交给全局 skill `dorothy-picture`：它先对六类内容源逐条做制图评估（结论落盘，不出图也要写理由），再用 11 字段决策卡定下教学任务、视觉顺序与替代文本，用令牌化内联 SVG 生成、渲染成 PNG 亲眼核对后交付。本 skill 只负责三件事：给它输入、把产出插到锚点、把图文闭环写进正文。
 
 它的图型库结构语法从 `lieflat-charts` 的三张基础型出发，配色字体换成本页令牌：
 
@@ -172,7 +172,7 @@ node "$dp\scripts\render_fig.js" --figure 'figs\fig-1-xxx.html' --css '<样式�
 
 ## 十、生成流程
 
-1. 读三份输入，通读正文，列出定义、定理、命题、引理、例题、经典对象。
+1. 读三份输入，通读正文，列出定义、定理、命题、引理、例题、经典对象；**先按 `reference/teaching-contract.md` 写出 `<产物>_teaching.md`**（读者档位 + 分簇 + 每单元六必需字段），拆卡与写卡的文字都从它取——不要边写 HTML 边想怎么讲。
 2. 拆卡：一个概念一张卡；证明跟定理卡走；结论性命题独立成定理卡。
 3. 每张卡写“一句话摘要”+ 展开内容 + 出处；两层不许同义重复。
 4. 画知识地图：按“基本对象 → 分析工具 → 结论”分层，节点 code（`C1`/`T1`/`E1`）与卡片 `id` 一一对应；关系只写材料里出现过的依赖。
@@ -180,19 +180,23 @@ node "$dp\scripts\render_fig.js" --figure 'figs\fig-1-xxx.html' --css '<样式�
 6. 末页两段：**自测**＝正文关键陈述改写成问句，答案照材料写；**课本章末习题**＝题目照抄课本、一题一张卡，教材给了答案才做展开面板，没给就在静态答案行写 `[待补充]`（不推断）。
 7. 统计元信息：知识点 = 概念 + 定理 + 例题卡数；定义/定理 = `DEF` / `THM` 卡数；预计复习 = 知识点 × 1.5 min + 自测题 × 1 min，向上取整到 5 min（估价，不是材料里的事实）。
 8. 复制模板填内容，替换 `<title>`、chrome、元信息条、地图节点；核心概念的三个板块卡数写进 `.tabs__n`（板内卡片按 `DEF` / `THM` / `EX` 归到定义 / 定理 / 例子）。
+   **有教学稿就别手抄教学层**：卡片里只写教材内容，再跑 `python -X utf8 scripts/inject_teaching.py '<产出.html>' --teaching '<产物>_teaching.md'` 机械填入（幂等：重复跑会先剥离旧教学层再重建；单元管多张卡时只落首卡）。手写与脚本二选一，手写的会被脚本覆盖。模板的卡片骨架**已内建教学层**（卡头 `.tk-q` 学习问题 → panel 内 直觉 `.tk-note` / 前置回放 `.is-recall` / 教材原文 `.tk-src` / 增补段 `.is-added` / 理解检查 `.tk-check` + 折叠答案 `.tk-ans`），照教学稿填空即可；教学稿缺哪块就整块删掉，不要留空壳。
 9. **互引**：先按第五节拟别名表与守卫词，跑 `scripts/refs.py --file …` 审报告，逐条核对后再 `--apply`。
-10. **插图**：按第六节挑 1–3 处，用 `scripts/figures.py` 改数据或照 B1/B2/B3 自画。
+10. **插图**：按第六节委托 `dorothy-picture` 做全量可视化评估，拿回 `figs/fig-*.html` 片段后内联。
 11. 跑自检（下节），改到 OK；浏览器里过一遍翻页、展开、地图拖拽、互引浮层。
 
 ## 十一、交付前自检
 
 ```powershell
 $env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'
+& '<python>' -X utf8 'scripts/check_teaching.py' '<产物>_teaching.md' --html '<产出.html>' --plan '<产物>_figures-plan.md'
 & '<python>' -X utf8 'scripts/check_note.py' '<产出.html>'
 & '<python>' -X utf8 'scripts/refs.py' --file '<产出.html>'
 ```
 
-`check_note.py` 检查：颜色是否全部令牌化、令牌是否齐全、`@font-face` 是否只用 `local()`、圆角/阴影/emoji/外链、字族数量、五页结构与翻页器、`#core/#pitfalls/#quiz` 与地图、互引链接是否指向存在的 id 且不在 SVG 里、浮层是否具备 `role="dialog"` 与返回键、插图 `figure/figcaption/svg` 是否成对、过渡属性里有没有 height/width、字号行高与公式间距、深色块数量、每张卡是否带出处、习题卡（`.quiz--ex`）是否带题号且"没有展开按钮时必有静态答案行"、双主题（主题块只许覆盖不得新增令牌、所有 `var()` 可解析、装饰件 `aria-hidden`、主题过渡只放开那 6 个颜色属性）、分板块（**逐组**校验：tab 与 board 数量一致、每组 `aria-selected="true"` 只有一个、每组初始只有一块可见、`aria-controls`/`aria-labelledby` 都能解析、核心概念与末页都要有分段控件、`.stack` 不得嵌套 `.stack`、翻页快捷键有 tablist 守卫）、顶栏搜索（索引限定 `#p-core .card`、有结果面板与空结果的"未找到"提示、翻页快捷键有 `[data-search]` 守卫、片段走 `createTextNode`）；并统计卡片数、自测题数、课本章末习题数、互引数、`[待补充]` 处数。
+`check_teaching.py` 检查教学稿是否满足契约：档位声明、分簇、每个单元的六必需字段（学习问题 / 正式 / 检查 / 图示任务 / 前置回放 / 来源；其中**前置回放是条件必需**——只写本章没有卡片的前提，本章已有卡可跳的写"无新增"）、“检查”必须带答案、“图示任务”二选一且不出图要带四维分数与理由、增补标记数与附表的 `我补了什么` 行数一致、无「更清晰/更美观/更直观/更易懂」、单元标题里的卡 id 与页面卡片双向对账、标“出图”的单元必须落在清单的出图名单里。教学层落进 HTML 的位置（哪个字段进卡头、哪个进 panel、增补段怎么标）见 `reference/teaching-contract.md` 第十节。
+
+`check_note.py` 检查：颜色是否全部令牌化、令牌是否齐全、`@font-face` 是否只用 `local()`、圆角/阴影/emoji/外链、字族数量、五页结构与翻页器、`#core/#pitfalls/#quiz` 与地图、互引链接是否指向存在的 id 且不在 SVG 里、浮层是否具备 `role="dialog"` 与返回键、插图 `figure/figcaption/svg` 是否成对、过渡属性里有没有 height/width、字号行高与公式间距、深色块数量、每张卡是否带出处、习题卡（`.quiz--ex`）是否带题号且"没有展开按钮时必有静态答案行"、双主题（主题块只许覆盖不得新增令牌、所有 `var()` 可解析、装饰件 `aria-hidden`、主题过渡只放开那 6 个颜色属性）、分板块（**逐组**校验：tab 与 board 数量一致、每组 `aria-selected="true"` 只有一个、每组初始只有一块可见、`aria-controls`/`aria-labelledby` 都能解析、核心概念与末页都要有分段控件、`.stack` 不得嵌套 `.stack`、翻页快捷键有 tablist 守卫）、顶栏搜索（索引限定 `#p-core .card`、有结果面板与空结果的"未找到"提示、翻页快捷键有 `[data-search]` 守卫、片段走 `createTextNode`）；并统计卡片数、自测题数、课本章末习题数、互引数、`[待补充]` 处数。页面带教学层（`.tk-q`）时再核对：学习问题 / 理解检查 / 答案折叠三者数目一致、有教学层必有 `.tk-src` 原文分隔、增补段只用 `.is-added` 段落左线（正文不该出现「补」字标，出现即警告；附录页若存在则正文必须有对应增补段）。
 
 再人工确认：
 
@@ -201,6 +205,8 @@ $env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'
 - [ ] 同组内展开一个时其他自动收起；自测题可同时看多题答案
 - [ ] 地图拖拽跟手、松手不飘、内容拖不出视野；点节点能跳到卡并展开
 - [ ] 互引术语是橙色带下划线，点开后背景模糊、浮层内容完整、返回回到原位置
+- [ ] 教学稿里所有「我补的」内容都标了来源、都能单独删掉（删掉后原文论述仍成立），且没有把补的直觉写成教材的结论
+- [ ] 带教学层的页面：卡片收起时就看得到「学习问题」（否则读者没有展开的理由）；展开后直觉块与「教材原文」有明确分隔；增补段靠段落左线就能一眼分出、正文里没有「补」字样
 - [ ] 插图数据与材料一致，示意参数与截断都写在图注里
 - [ ] 材料缺的部分都写成 `[待补充]`，没有编造
 - [ ] 顶栏主题开关能在孤星 ⇄ NASA-punk 间切换：颜色平滑过渡、进度条走满后淡出、切完不闪；刷新（或另开一章）后记得上次的选择，`file://` 下记忆不可用也不报错
@@ -216,8 +222,8 @@ $env:PYTHONUTF8='1'; $env:PYTHONIOENCODING='utf-8'
 $HOME\.agents\skills\dorothy-html\
 ├── SKILL.md                     本文件
 ├── assets\note-template.html    单文件模板
-├── reference\                   design-spec.md · content-mapping.md
-└── scripts\                     check_note.py · refs.py · figures.py · build_template.py
+├── reference\                   design-spec.md · content-mapping.md · teaching-contract.md
+└── scripts\                     check_note.py · check_teaching.py · refs.py · build_template.py · inject_teaching.py · lib\teachlib.py
 ```
 
 同步（工作区源码 → 全局安装）：

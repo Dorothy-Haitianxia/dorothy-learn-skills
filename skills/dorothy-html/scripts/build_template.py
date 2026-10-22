@@ -33,13 +33,28 @@ CARD = '''          <article class="card" id="{cid}">
               <h3 class="card__title">{title}</h3>
             </div>
             <p class="card__summary">{summary}</p>
+            <!-- 学习问题：必须上到卡头，读者在收起状态就要知道"这张卡为什么存在" -->
+            <p class="tk-q"><b>学习问题</b>为什么这个概念非要单独定义一次？（教学稿「学习问题」原句）</p>
             <button class="toggle" type="button" aria-expanded="false" aria-controls="{cid}-body"
                     data-open-label="收起{open_tx}" data-close-label="展开{open_tx}">
               <span class="toggle__tx">展开{open_tx}</span><span class="toggle__ico" aria-hidden="true">+</span>
             </button>
             <div class="panel" id="{cid}-body" hidden>
               <div class="panel__inner prose">
-                <p>{body}</p>
+                <!-- 教学层四块，顺序固定：直觉 → 前置回放 → 教材原文 → 理解检查。
+                     内容全部来自教学稿，缺哪块就删哪块，不要在这里临时编。 -->
+                <div class="tk-note"><span class="tk-label">直觉</span><p>把这个概念"想成什么"的一句话（教学稿「直觉」原句）。</p></div>
+                <details class="is-recall">
+                  <summary>回放 · 1 处：前置概念名</summary>
+                  <div class="tk-recall"><b>前置概念名</b><p>一句话把它拉回来（教学稿「前置回放」原句）。</p></div>
+                </details>
+                <div class="tk-src"><p class="tk-src-label">教材原文</p>
+                  <div class="tk-src-body"><p>{body}</p></div>
+                </div>
+                <p class="is-added">导师增补的一句：只用这条极浅左线区分，正文里不写「补」字样，文末也不做清单。</p>
+                <div class="fig__check tk-check"><b>理解检查</b>检验是否真懂的一个小问题？
+                  <details class="tk-ans"><summary>看答案</summary><p>答案（教学稿「检查」的答案原句）。</p></details>
+                </div>
                 <p class="card__src">出处：正文 §X.Y</p>
               </div>
             </div>
@@ -234,7 +249,7 @@ BODY = f'''<body>
               <div class="panel__inner prose">
                 <ol><li>第一步</li><li>第二步</li></ol>
 
-                <!-- 插图：结构沿用 lieflat-charts 的 B1/B2/B3，配色字体换成本页令牌 -->
+                <!-- 插图：片段由 dorothy-picture 生成，只挂语义类，配色字体走本页令牌 -->
                 <figure class="fig" id="fig-demo">
                   <svg viewBox="0 0 640 200" role="img" aria-label="（图的类型 + 主体 + 变量范围，供读屏；不许以「图片 / 示意图」开头）">
                     <title>（同 aria-label）</title>
@@ -280,6 +295,7 @@ BODY = f'''<body>
                 <h3 class="card__title">错误说法（照抄材料里出现过的说法）</h3>
               </div>
               <p class="card__summary">触发场景：什么情况下容易这么想。</p>
+              <p class="tk-q"><b>学习问题</b>这个说法错在哪一步？（教学稿「学习问题」原句）</p>
               <button class="toggle" type="button" aria-expanded="false" aria-controls="p1-body"
                       data-open-label="收起限制条件" data-close-label="展开限制条件与正确做法">
                 <span class="toggle__tx">展开限制条件与正确做法</span><span class="toggle__ico" aria-hidden="true">+</span>

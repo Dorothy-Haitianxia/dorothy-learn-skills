@@ -5,6 +5,10 @@
 用法：
   python scripts/check_note.py <笔记.html> [<笔记.html> ...]
   python scripts/check_note.py --json <笔记.html>
+  python scripts/check_note.py --core prose <笔记.html>
+
+--core prose 用于叙事版：核心概念不再分三分板块、末页只留一组分段控件、
+卡片在 .tk-flow 里按教学顺序单列排开。默认 --core boards 是分板块卡片版。
 
 只依赖标准库。ERROR 会以非零退出码结束，WARN/INFO 只打印。
 """
@@ -72,7 +76,7 @@ def strip_root(text):
     return body, base, themes
 
 
-def check(path, plan_path=None):
+def check(path, plan_path=None, core_mode='boards'):
     errors, warns, infos = [], [], []
     with open(path, encoding='utf-8-sig') as handle:
         raw = handle.read()
@@ -270,10 +274,19 @@ def check(path, plan_path=None):
     board_tags = re.findall(r'<div class="board"[^>]*>', raw)
     all_tabs = re.findall(r'<button[^>]*role="tab"[^>]*>', raw)
     if board_tags or groups:
-        if not groups:
-            errors.append('有 .board 板块但缺少 role="tablist" 分段控件（[data-tabs]）')
-        if len(board_tags) < 2:
-            errors.append('板块少于 2 个（定义 / 定理 / 例子要分板块）')
+        if core_mode == 'prose':
+            if '<div class="tk-flow">' not in raw:
+                errors.append('叙事版（--core prose）找不到 .tk-flow 容器')
+            for tag in board_tags:
+                if re.search(r'data-board="(?:def|thm|ex)"', tag):
+                    errors.append('叙事版（--core prose）核心概念不该再分板块：' + tag[:60])
+            if len(groups) != 1:
+                errors.append('叙事版只有末页一组分段控件，实为 %d 组' % len(groups))
+        else:
+            if not groups:
+                errors.append('有 .board 板块但缺少 role="tablist" 分段控件（[data-tabs]）')
+            if len(board_tags) < 2:
+                errors.append('板块少于 2 个（定义 / 定理 / 例子要分板块）')
         tags_by_id = {}
         for tag in board_tags:
             if 'role="tabpanel"' not in tag:
@@ -288,7 +301,7 @@ def check(path, plan_path=None):
             lab = re.search(r'aria-labelledby="([^"]+)"', tag)
             if not lab or lab.group(1) not in ids:
                 errors.append('板块的 aria-labelledby 指向不存在的 tab：' + tag[:70])
-        if 'id="core"' in ids and 'id="quiz"' in ids and len(groups) < 2:
+        if core_mode != 'prose' and len(groups) < 2:
             errors.append('核心概念与末页自测/习题都要分板块：只找到 %d 组分段控件' % len(groups))
         for name, inner in groups:
             gtabs = re.findall(r'<button[^>]*role="tab"[^>]*>', inner)
@@ -418,16 +431,45 @@ def check(path, plan_path=None):
         warns.append('缺少 .bar（语义标签条）样式')
 
     # 12. 内容纪律
-    cards = re.findall(r'<article class="card"', raw)
+    cards = re.findall(r'<article class="card(?=[\s"])', raw)   # 含卡片版 class="card"、叙事版 class="card is-open"
     quizzes = re.findall(r'<article class="quiz\b', raw)   # 含 .quiz--ex 课本章末习题
     srcs = re.findall(r'class="card__src"', raw)
     todo = raw.count('[待补充]')
     if cards and len(srcs) < len(cards):
         warns.append('有 %d 张卡没有出处行 .card__src' % (len(cards) - len(srcs)))
     codes = Counter(re.findall(r'<span>(%s)</span>' % '|'.join(SEMANTIC_CODES), raw))
-    infos.append('知识卡 %d 张 / 自测题 %d 道 / 课本章末习题 %d 道 / 出处行 %d / 板块 %d 个（%d 组分段控件）' % (len(cards), len(quizzes) - len(exercises), len(exercises), len(srcs), len(board_tags), len(groups)))
+    infos.append('结构 %s / 知识卡 %d 张 / 自测题 %d 道 / 课本章末习题 %d 道 / 出处行 %d / 板块 %d 个（%d 组分段控件）' % ('叙事版（.tk-flow）' if core_mode == 'prose' else '分板块', len(cards), len(quizzes) - len(exercises), len(exercises), len(srcs), len(board_tags), len(groups)))
     infos.append('语义标签：' + (', '.join('%s×%d' % kv for kv in sorted(codes.items())) or '无'))
     infos.append('[待补充] %d 处' % todo)
+
+    # 13. 教学层（第二层教学稿落进卡片的痕迹）：只在页面确实带教学层时校验
+    plain = re.sub(r'<style[\s\S]*?</style>', '', raw)
+    tk_q = len(re.findall(r'class="tk-q"', plain))
+    if tk_q:
+        tk_check = len(re.findall(r'class="fig__check tk-check"', plain))
+        tk_ans = len(re.findall(r'class="tk-ans"', plain))
+        recalls = len(re.findall(r'class="is-recall"', plain))
+        added = len(re.findall(r'class="[^"]*\bis-added\b', plain))
+        marks = len(re.findall(r'class="tk-mark"', plain))
+        tk_src = len(re.findall(r'class="tk-src"', plain))
+        if not tk_check:
+            errors.append('有教学层（学习问题）但没有理解检查 .tk-check')
+        if tk_ans != tk_check:
+            errors.append('理解检查 %d 处与答案折叠 %d 处不一致' % (tk_check, tk_ans))
+        if not tk_src:
+            errors.append('有教学层但没有教材原文分隔 .tk-src——导师的话与书上的话分不开')
+        # 增补段只用段落级 `.is-added` 左线区分，正文里不放「补」字小标，也不做文末附录（读者嫌碍眼）。
+        # 因此这里只做反查：附录若出现，正文必须有对应的增补段，免得留一张空表。
+        if 'id="p-added"' in raw and not added:
+            errors.append('页面有「我补了什么」附录（#p-added）但正文没有一处增补段 .is-added')
+        if marks:
+            warns.append('正文里还有 %d 处「补」字标 .tk-mark——已约定只用段落左线区分，删除字样标记' % marks)
+        if not recalls:
+            warns.append('没有一个前置回放 .is-recall——确认本章确实没有跨段复用的前置概念')
+        if tk_q * 2 < len(cards):
+            warns.append('教学层只覆盖 %d / %d 张卡，确认是刻意精简而不是漏写' % (tk_q, len(cards)))
+        infos.append('教学层：学习问题 %d / 前置回放 %d / 教材原文分隔 %d / 理解检查 %d（答案折叠 %d）/ 增补段 %d（左线区分）'
+                     % (tk_q, recalls, tk_src, tk_check, tk_ans, added))
 
     return errors, warns, infos
 
@@ -436,13 +478,20 @@ def main(argv):
     as_json = '--json' in argv
     plan_path = argv[argv.index('--plan') + 1] if '--plan' in argv else None
     skip = {plan_path} if plan_path else set()
+    core_mode = 'boards'
+    if '--core' in argv:
+        i = argv.index('--core')
+        core_mode = argv[i + 1] if i + 1 < len(argv) else 'boards'
+        skip.add(core_mode)
+        if core_mode not in ('boards', 'prose'):
+            raise SystemExit('--core 只接受 boards / prose')
     paths = [a for a in argv if not a.startswith('--') and a not in skip]
     if not paths:
         raise SystemExit(__doc__)
     failed = False
     report = {}
     for path in paths:
-        errors, warns, infos = check(path, plan_path)
+        errors, warns, infos = check(path, plan_path, core_mode)
         report[path] = {'errors': errors, 'warns': warns, 'infos': infos}
         if errors:
             failed = True

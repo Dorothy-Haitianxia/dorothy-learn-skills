@@ -72,7 +72,7 @@
 
 ## 五、插图：图型由 dorothy-picture 提供
 
-插图不在这一侧生成。**制图评估、图型选择、八字段规划、渲染核对都在 `dorothy-picture` 里做**（它的 `reference/assessment.md` 有六类障碍 → 图型对照表）。本侧只做三件事：
+插图不在这一侧生成。**制图评估、图型选择、11 字段决策卡与编排、渲染核对都在 `dorothy-picture` 里做**（它的 `reference/assessment.md` 有六类障碍 → 图型对照表，`reference/plan-contract.md` 定义字段口径）。本侧只做三件事：
 
 1. 产出 `<产物>_figure-assets.md`（本地可用图清单：路径 / 尺寸 / 能讲什么）；
 2. 把 `figs/fig-<N>-<slug>.html` 插到规划清单写的**插入锚点**处，并写图前引导与图后解释；

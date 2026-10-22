@@ -108,7 +108,7 @@
 | 翻页 | 退场立刻、入场等 60ms（两拍）；位移 ±16px |
 | 展开面板 | `opacity` + `translateY(-7px→0)`，`.22s` |
 | 地图节点入场 | `translateY(+16px→0)` + `opacity`，`34ms × 序号`（封顶 400ms）；连线用 `pathLength="1"` + `stroke-dashoffset` 生长 |
-| 图表入场 | 挂在 `.panel.is-in .fig …`，卡片展开时才播；stagger 见 `figures.py` |
+| 图表入场 | 挂在 `.panel.is-in .fig …`，卡片展开时才播；按挂类分四拍（`.f-fade` 淡入 / `.f-line` 画线 / `.f-dot`·`.f-arrow` 落点 / `.f-line--acc-dash` 换虚线），规则在 `assets/note-template.html` 的 8.5 节，**不按序号 stagger** |
 | 禁止 | `height` / `width` / `max-height` 过渡；缩放回弹以外的弹簧；模糊转场 |
 | 板块切换 | `.board.is-in` 的 `boardIn`：`opacity` + `translateY(12px→0)`，`.22s`（`--t-fast` / `--e-out`）；指示条 `.tabs__ind` 只动 `transform:translateX(...)`，同一条曲线 |
 | 降级 | `prefers-reduced-motion` 用通配长属性规则一次清干净（`.board.is-in` 另有 `animation:none`）；JS 的定时收尾留 `SETTLE` 兜底 |

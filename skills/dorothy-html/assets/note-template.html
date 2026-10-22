@@ -487,6 +487,14 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .section{margin-top:46px;}
 .section:first-child{margin-top:0;}
 .section__head{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+/* 核心概念的标题行（含三分板块分段控件）随滚动钉住：翻到下面也要能随时切定义/定理/例子。
+   纸色底遮住滚过去的卡片，下缘留一条细分隔，避免与内容糊在一起。 */
+#p-core .section__head{
+  position:sticky;top:-26px;z-index:7;     /* 26px = .page__inner 的 padding-top；上探这段才盖得住滚过去的卡片 */
+  margin-top:-30px;margin-bottom:10px;
+  padding:34px 0 11px;                     /* 26 上探 + 8 贴顶呼吸；30 由 margin-top 抵消回原位 */
+  background:var(--paper);border-bottom:1px solid var(--line-2);
+}
 .bar{display:inline-flex;align-items:stretch;background:var(--dark);}
 .bar__sq{width:11px;background:var(--accent);flex:0 0 auto;}
 .bar__tx{padding:8px 18px;font-size:15px;letter-spacing:3px;color:var(--on-dark);}
@@ -645,7 +653,17 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .toggle:hover{color:var(--accent-ink);}
 .toggle[aria-expanded="true"]{color:var(--accent-ink);}
 .toggle__ico{font-size:15px;line-height:1;}
-.panel{margin-top:13px;padding-top:15px;border-top:1px solid var(--line-2);}
+/* 展开/收起：高度走 grid-template-rows 0fr↔1fr 过渡。这样同组互斥收起时旧卡是"缩"下去的，
+   不是瞬间塌陷，避免换卡时整页跳动（规则仍然不写 height / max-height）。 */
+.panel{
+  display:grid;grid-template-rows:0fr;
+  margin-top:0;padding-top:0;border-top:0;
+  transition:grid-template-rows var(--dur) var(--e-out),
+             margin-top var(--dur) var(--e-out),
+             padding-top var(--dur) var(--e-out);
+}
+.panel.is-in{grid-template-rows:1fr;margin-top:13px;padding-top:15px;border-top:1px solid var(--line-2);}
+.panel > .panel__inner{overflow:hidden;min-height:0;}
 .panel__inner{
   opacity:0;transform:translateY(-7px);
   transition:opacity var(--dur) var(--e-out),transform var(--dur) var(--e-out);
@@ -686,7 +704,7 @@ sup{top:-.44em;}
 sub{top:.24em;}
 
 /* ============================================================
-   8.5 插图（结构沿用 lieflat-charts 的 B1/B2/B3，配色字体换成本页令牌）
+   8.5 插图（片段由 dorothy-picture 生成，只挂语义类，配色字体走本页令牌）
    ============================================================ */
 .fig{margin:1.6em 0;}
 .fig svg{width:100%;height:auto;display:block;}
@@ -785,7 +803,8 @@ sub{top:.24em;}
 .refbox__back:hover{color:var(--accent);}
 .refbox__body .tag{margin-bottom:10px;}
 .refbox__body .card__title{font-size:22px;margin-bottom:10px;}
-.refbox__body .panel{border-top:0;padding-top:0;margin-top:14px;}
+.refbox__body .panel,
+.refbox__body .panel.is-in{border-top:0;padding-top:0;margin-top:14px;}
 .refbox__body .panel__inner{opacity:1;transform:none;}
 .refbox__body .card__src{margin-top:16px;}
 
@@ -801,7 +820,7 @@ sub{top:.24em;}
 .quiz__q{position:relative;padding-left:2.6em;max-width:var(--measure);font-size:18px;color:var(--ink);}
 .quiz__no{position:absolute;left:0;top:.28em;font-family:var(--font-mono);font-size:13px;
   color:var(--accent-ink);}
-.quiz .panel{margin-top:11px;}
+.quiz .panel.is-in{margin-top:11px;}
 .quiz__a{font-size:18px;color:var(--ink-2);}
 
 /* 末页第二段：课本章末习题。
@@ -844,6 +863,202 @@ sub{top:.24em;}
   .search__in{width:clamp(92px,30vw,180px);}
 }
 
+/* ===== 教学层（第二层教学稿落进卡片）===== */
+/* ----------------------------------------------------------------
+   教学层（teaching layer）：两版实验共用
+   变量全部取自 _style.css 的令牌，不引入新颜色。
+   正式产物 ch08-概率论基础.html 不加载这个文件。
+   ---------------------------------------------------------------- */
+
+/* 学习问题：每单元的第一句话，用左侧橙线标出 */
+.tk-q {
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+  font-size: 17px;
+  color: var(--ink);
+}
+.tk-q b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .1em;
+  color: var(--accent);
+}
+
+/* 直觉 / 补充说明：纸色块，左侧细线表示「这是我补的」 */
+.tk-note {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border: 1px solid var(--line-2);
+  background: var(--paper-2);
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.tk-note.is-added { border-left: 2px solid var(--accent-soft); }
+.tk-note > p { margin: 0; }
+.tk-note > p + p { margin-top: 8px; }
+.tk-note ul, .tk-note ol { margin: 6px 0 0; }
+
+.tk-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .1em;
+  color: var(--accent);
+}
+
+/* 前置回放：默认收起，虚线框表示「可跳过」 */
+.is-recall {
+  margin: 0 0 14px;
+  padding: 9px 14px;
+  border: 1px dashed var(--line);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.is-recall > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+.is-recall > summary::-webkit-details-marker { display: none; }
+.is-recall > summary::before { content: "+"; margin-right: 8px; color: var(--accent); }
+.is-recall[open] > summary::before { content: "−"; }
+.is-recall > summary em { font-style: normal; margin-left: 8px; color: var(--faint); }
+.is-recall p { margin: 9px 0 0; }
+
+/* 理解检查：与图后的检查同一套样子 */
+.tk-check {
+  margin-top: 18px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line-2);
+}
+.tk-check b { margin-right: 6px; }
+
+/* 教学稿里的表格 */
+.teach-table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.teach-table th, .teach-table td {
+  padding: 6px 9px;
+  border: 1px solid var(--line-2);
+  text-align: left;
+  vertical-align: top;
+}
+.teach-table th {
+  background: var(--paper-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+/* ----------------------------------------------------------------
+   只有叙事版会用到：簇标题 + 单列连续排布
+   ---------------------------------------------------------------- */
+.tk-cluster {
+  margin: 40px 0 4px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: .02em;
+  color: var(--ink);
+}
+.tk-cluster:first-child { margin-top: 0; }
+
+.tk-flow {
+  display: block;
+  /* 单列长文：比 --measure（36em）宽一点留给图，但远窄于两列网格的整幅 */
+  max-width: 44em;
+}
+.tk-flow .card,
+.tk-flow .card.is-open {
+  margin: 0;
+  padding: 22px 0 26px;
+  border: 0;
+  border-top: 1px solid var(--line-2);
+  background: transparent;
+}
+.tk-flow .card:first-of-type { border-top: 0; }
+.tk-flow .card__figs { top: 24px; right: 0; }
+
+/* ----------------------------------------------------------------
+   0.3 起：教学层的四块内容各就各位
+   卡头（收起可见）：学习问题
+   panel 内：直觉 → 前置回放 → 教材原文（分隔）→ 理解检查（答案折叠）
+   ---------------------------------------------------------------- */
+
+/* 卡头的学习问题：收起时也看得见，一行就够，不抢标题 */
+.card > .tk-q {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.card > .tk-q b {
+  display: inline;
+  margin: 0 8px 0 0;
+  font-size: 10px;
+}
+
+/* 前置回放里的每一条：术语 + 一句话定义 + 最小例子 */
+.tk-recall { margin: 10px 0 0; }
+.tk-recall:first-of-type { margin-top: 12px; }
+.tk-recall b {
+  display: inline-block;
+  min-width: 4.2em;
+  margin-right: 8px;
+  font-weight: 400;
+  color: var(--accent);
+}
+.tk-recall p { display: inline; margin: 0; }
+.tk-recall ul, .tk-recall ol { display: block; margin: 4px 0 0; }
+
+/* 答案：默认收起，和自测题一致 */
+.tk-ans { margin: 9px 0 0; font-size: 15px; }
+.tk-ans > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--accent);
+}
+.tk-ans > summary::-webkit-details-marker { display: none; }
+.tk-ans > summary::before { content: "+"; margin-right: 6px; }
+.tk-ans[open] > summary::before { content: "−"; }
+.tk-ans > p { margin: 7px 0 0; color: var(--ink-2); }
+
+/* 教材原文：和教学层之间有一道线，读者一眼知道「从这里开始是书里的」 */
+.tk-src { margin: 16px 0 0; padding: 13px 0 0; border-top: 1px solid var(--line-2); }
+.tk-src-label {
+  margin: 0 0 9px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: var(--faint);
+}
+.tk-src-body > * + * { margin-top: .9em; }
+
+/* 增补段：只用一条极浅的左线区分，正文里不放任何字样标记 */
+p.is-added, div.is-added {
+  border-left: 1px solid var(--line);
+  padding-left: 11px;
+}
+
 /* 降级：通配长属性写法（cassette 的做法）——一条规则清掉所有过渡与动画的时长/延迟 */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
@@ -855,6 +1070,7 @@ sub{top:.24em;}
   }
   .page{transform:none;}
   .panel__inner{transition:none;opacity:1;transform:none;}
+  .panel{transition:none;}
   .mapwrap.is-in .node,.mapwrap.is-in .edge,.mapwrap.is-in .edge__line,
   .card.is-flash{animation:none;}
   .pager__fill{transition:none;}
@@ -1029,13 +1245,28 @@ if(t==='nasapunk'||t==='lonetrail'){document.documentElement.setAttribute('data-
               <h3 class="card__title">概念名</h3>
             </div>
             <p class="card__summary">一句话摘要：扫读用，写清这个概念解决什么问题。</p>
+            <!-- 学习问题：必须上到卡头，读者在收起状态就要知道"这张卡为什么存在" -->
+            <p class="tk-q"><b>学习问题</b>为什么这个概念非要单独定义一次？（教学稿「学习问题」原句）</p>
             <button class="toggle" type="button" aria-expanded="false" aria-controls="c1-body"
                     data-open-label="收起完整定义" data-close-label="展开完整定义">
               <span class="toggle__tx">展开完整定义</span><span class="toggle__ico" aria-hidden="true">+</span>
             </button>
             <div class="panel" id="c1-body" hidden>
               <div class="panel__inner prose">
-                <p>完整定义（照抄正文表述）。提到前面某个概念时写成 <a href="#c2" class="ref" data-ref="c2">该概念</a>，点击会浮出前置概念速览。</p>
+                <!-- 教学层四块，顺序固定：直觉 → 前置回放 → 教材原文 → 理解检查。
+                     内容全部来自教学稿，缺哪块就删哪块，不要在这里临时编。 -->
+                <div class="tk-note"><span class="tk-label">直觉</span><p>把这个概念"想成什么"的一句话（教学稿「直觉」原句）。</p></div>
+                <details class="is-recall">
+                  <summary>回放 · 1 处：前置概念名</summary>
+                  <div class="tk-recall"><b>前置概念名</b><p>一句话把它拉回来（教学稿「前置回放」原句）。</p></div>
+                </details>
+                <div class="tk-src"><p class="tk-src-label">教材原文</p>
+                  <div class="tk-src-body"><p>完整定义（照抄正文表述）。提到前面某个概念时写成 <a href="#c2" class="ref" data-ref="c2">该概念</a>，点击会浮出前置概念速览。</p></div>
+                </div>
+                <p class="is-added">导师增补的一句：只用这条极浅左线区分，正文里不写「补」字样，文末也不做清单。</p>
+                <div class="fig__check tk-check"><b>理解检查</b>检验是否真懂的一个小问题？
+                  <details class="tk-ans"><summary>看答案</summary><p>答案（教学稿「检查」的答案原句）。</p></details>
+                </div>
                 <p class="card__src">出处：正文 §X.Y</p>
               </div>
             </div>
@@ -1046,13 +1277,28 @@ if(t==='nasapunk'||t==='lonetrail'){document.documentElement.setAttribute('data-
               <h3 class="card__title">后面的概念名</h3>
             </div>
             <p class="card__summary">一句话摘要。</p>
+            <!-- 学习问题：必须上到卡头，读者在收起状态就要知道"这张卡为什么存在" -->
+            <p class="tk-q"><b>学习问题</b>为什么这个概念非要单独定义一次？（教学稿「学习问题」原句）</p>
             <button class="toggle" type="button" aria-expanded="false" aria-controls="c2-body"
                     data-open-label="收起完整定义" data-close-label="展开完整定义">
               <span class="toggle__tx">展开完整定义</span><span class="toggle__ico" aria-hidden="true">+</span>
             </button>
             <div class="panel" id="c2-body" hidden>
               <div class="panel__inner prose">
-                <p>完整定义。</p>
+                <!-- 教学层四块，顺序固定：直觉 → 前置回放 → 教材原文 → 理解检查。
+                     内容全部来自教学稿，缺哪块就删哪块，不要在这里临时编。 -->
+                <div class="tk-note"><span class="tk-label">直觉</span><p>把这个概念"想成什么"的一句话（教学稿「直觉」原句）。</p></div>
+                <details class="is-recall">
+                  <summary>回放 · 1 处：前置概念名</summary>
+                  <div class="tk-recall"><b>前置概念名</b><p>一句话把它拉回来（教学稿「前置回放」原句）。</p></div>
+                </details>
+                <div class="tk-src"><p class="tk-src-label">教材原文</p>
+                  <div class="tk-src-body"><p>完整定义。</p></div>
+                </div>
+                <p class="is-added">导师增补的一句：只用这条极浅左线区分，正文里不写「补」字样，文末也不做清单。</p>
+                <div class="fig__check tk-check"><b>理解检查</b>检验是否真懂的一个小问题？
+                  <details class="tk-ans"><summary>看答案</summary><p>答案（教学稿「检查」的答案原句）。</p></details>
+                </div>
                 <p class="card__src">出处：正文 §X.Y</p>
               </div>
             </div>
@@ -1103,7 +1349,7 @@ if(t==='nasapunk'||t==='lonetrail'){document.documentElement.setAttribute('data-
               <div class="panel__inner prose">
                 <ol><li>第一步</li><li>第二步</li></ol>
 
-                <!-- 插图：结构沿用 lieflat-charts 的 B1/B2/B3，配色字体换成本页令牌 -->
+                <!-- 插图：片段由 dorothy-picture 生成，只挂语义类，配色字体走本页令牌 -->
                 <figure class="fig" id="fig-demo">
                   <svg viewBox="0 0 640 200" role="img" aria-label="（图的类型 + 主体 + 变量范围，供读屏；不许以「图片 / 示意图」开头）">
                     <title>（同 aria-label）</title>
@@ -1149,6 +1395,7 @@ if(t==='nasapunk'||t==='lonetrail'){document.documentElement.setAttribute('data-
                 <h3 class="card__title">错误说法（照抄材料里出现过的说法）</h3>
               </div>
               <p class="card__summary">触发场景：什么情况下容易这么想。</p>
+              <p class="tk-q"><b>学习问题</b>这个说法错在哪一步？（教学稿「学习问题」原句）</p>
               <button class="toggle" type="button" aria-expanded="false" aria-controls="p1-body"
                       data-open-label="收起限制条件" data-close-label="展开限制条件与正确做法">
                 <span class="toggle__tx">展开限制条件与正确做法</span><span class="toggle__ico" aria-hidden="true">+</span>
