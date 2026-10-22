@@ -27,7 +27,7 @@ ps：本项目为肘击大肥鱼生成，是vibe coding的！
 |---|---|
 | `skills/dorothy-html/` | 课本 → 单文件知识笔记 HTML。`SKILL.md`、模板 `assets/note-template.html`（由 `build_template.py` 生成，已内建教学层骨架）、`reference/`（设计规格、内容映射、**教学稿契约** `teaching-contract.md`）、`scripts/`（自检 `check_note.py`、互引 `refs.py`、模板构建 `build_template.py`、教学稿校验 `check_teaching.py`、教学层注入 `inject_teaching.py` 与其内核 `lib/teachlib.py`） |
 | `skills/dorothy-picture/` | 教学制图，被 dorothy-html 内联。`SKILL.md`、`reference/`（评估、选图范例、视觉文法、交互图、规划契约）、`assets/`、`scripts/`（图型库 `lib/figlib.py`、渲染核对 `render_fig.js`、机械校验 `check_figure.py` / `check_plan.py`、JS 抽取 `extract_js.py`） |
-| `beta/` | 第 8 章「概率论基础」试点：样式源 `_style.css` / `_app.js`、构建 `_build.py` 与 `_build_tk.py`、教学稿 `ch08-概率论基础_teaching.md`、插图片段 `figs/`、制图规划与成本清单、四个版本快照 `ch08-beta0.1–0.4.html`。成品 HTML、教学稿与教材原文片段**不入库**（含第三方教材的逐句翻译正文，见 `.gitignore`），需要的话用你自己的材料在本地生成 |
+| `beta/` | 本地试点工作区，**整目录不入库**：第 8 章的构建脚本 `_build.py` / `_build_tk.py` / `_page.py`、教学稿 `ch08-概率论基础_teaching.md`、插图片段 `figs/`、制图规划与成本清单、四个版本快照 `ch08-beta0.1–0.4.html`。其中含第三方教材的逐句翻译与习题，所以一律不进仓库。**样式与交互层的源已移入 `skills/dorothy-html/assets/src/`** —— clone 下来没有这个目录，两个 skill 仍可完整使用 |
 | `参考教材 报告/` | 参考教材的图文设计分析，用来提炼选图与排版规则。**仅本地留存、不入库**（含第三方教材截图，见 `.gitignore`） |
 
 ## 安装
@@ -117,12 +117,12 @@ node --check skills/dorothy-picture/scripts/render_fig.js
 | `skills/dorothy-html/scripts/check_teaching.py` | **教学稿自检**：档位、六必需字段、增补计数（正文 ↔ 文末附表对账）、N 值表、卡片覆盖、禁用词 |
 | `skills/dorothy-html/scripts/inject_teaching.py` | **教学层注入**：把教学稿按固定骨架填进卡片 HTML，幂等（先剥离旧层再重建）；`--dry-run` 只报数 |
 | `skills/dorothy-html/scripts/lib/teachlib.py` | 教学稿解析与渲染的唯一实现：单元 / 簇、字段、前置回放的术语抽取、MD 轻渲染、`[增补]` 段落标记 |
-| `skills/dorothy-html/scripts/build_template.py` | 模板构建脚本：把 beta 的样式与交互层搬进模板骨架 |
-| `beta/ch08-概率论基础-卡片版.html` | 第 8 章试点成品（**不入库**，本地生成）。含 §8.3 课本章末习题 8.1–8.16；课本没给解答，标 `[待补充]` |
-| `beta/ch08-概率论基础_teaching.md` | 该章的教学稿（第二层）。**含教材转述，不入库**；格式见 `teaching-contract.md` |
-| `beta/_style.css` · `beta/_app.js` | 模板的唯一样式/交互源：`build_template.py` 把这两个文件原样写进模板（改样式改这里，不要直接改模板） |
-| `beta/_exercises.html` | 课本章末 16 道习题的卡片片段（题目照抄正文，由 `_build.py` 拼进末页）；**含教材内容，不入库** |
-| `beta/ch08-概率论基础_refs-review.md` | 该成品的 23 处互引清单（别名表、守卫表、每处上下文） |
+| `skills/dorothy-html/scripts/build_template.py` | 模板构建脚本：把 `assets/src/style.css` 与 `assets/src/app.js` 合进模板骨架；不读仓库外任何目录，clone 到哪儿都能重建 |
+| `beta/ch08-概率论基础-卡片版.html` | 第 8 章试点成品（**本地生成，不入库**）。含 §8.3 课本章末习题 8.1–8.16；课本没给解答，标 `[待补充]` |
+| `beta/ch08-概率论基础_teaching.md` | 该章的教学稿（第二层）。**含教材转述，本地留存，不入库**；格式见 `teaching-contract.md` |
+| `skills/dorothy-html/assets/src/style.css` · `app.js` | 模板的唯一样式/交互源：`build_template.py` 把这两个文件原样写进模板（改样式改这里，不要直接改模板） |
+| `beta/_exercises.html` | 课本章末 16 道习题的卡片片段（题目照抄正文，由 `_build.py` 拼进末页）；**含教材内容，本地留存，不入库** |
+| `beta/ch08-概率论基础_refs-review.md` | 该成品的 23 处互引清单（别名表、守卫表、每处上下文）；本地生成，不入库 |
 
 ## 教学层：第二层教学稿
 
@@ -130,7 +130,7 @@ node --check skills/dorothy-picture/scripts/render_fig.js
 
 | 层 | 文件 | 回答什么问题 |
 |---|---|---|
-| 第一层 教材译文 | `beta/_source.html` | 书上说了什么（逐句翻译，不改动） |
+| 第一层 教材译文 | `<教材译文>.html` | 书上说了什么（逐句翻译，不改动） |
 | 第二层 教学稿 | `ch08-概率论基础_teaching.md` | **怎么讲**：读者的卡点在哪、这个概念为什么非存在不可、缺哪个前提 |
 | 第三层 HTML | `ch08-概率论基础-卡片版.html` | 怎么排、怎么点（前两层机械合成，不许在排版时改内容） |
 
@@ -239,7 +239,7 @@ $sk = "$HOME\.agents\skills\dorothy-html"      # 或工作区源码 skills\dorot
 
 ## 构建与三个对照版本
 
-`beta/` 下的成品都**不入库**（含教材正文），但构建脚本入库，可以对着你自己的材料跑。
+两个 skill **不依赖 `beta/`**：模板构建、注入、全部校验器都只看 `skills/` 内部，clone 下来没有 `beta/` 也能跑。下面这些构建脚本在本地 `beta/`（整目录不入库），用来复现第 8 章试点——仓库交付的是模板 + 校验器 + 契约，材料要你自己准备。
 
 | 命令 | 产物 | 形态 |
 |---|---|---|
@@ -269,9 +269,9 @@ NASA-punk 已经**收进基础样式**，作为第二套令牌存在，不再是
 
 | 位置 | 内容 |
 |---|---|
-| `beta/_style.css` 的 `:root[data-theme="nasapunk"]{}` | NASA-punk 的令牌块（设备白 `#ECE5D6`、身份四色 `#4C5A68 #7A7F4E #D2A85E #A8432F`、唯一鲜色 `#D63A2C`）+ 机身线条：彩条、警示斜纹、接缝铆钉、角螺丝、卡片双细线、痕迹覆盖层 |
-| `beta/_style.css` 的 `.np-chrome` | 装饰件常驻 DOM：孤星下 `display:none`（不占排布），NASA-punk 下 `display:contents` 并按 34ms 级联淡入 |
-| `beta/_app.js` 的主题模块 | `setTheme()`：加 `.is-theming` → 强制重排 → 换 `data-theme` → rAF 驱动百分比进度条 → 驻留 240ms 后淡出；`localStorage['dorothy:theme']` 记忆，`try/catch` 兜底 |
+| `skills/dorothy-html/assets/src/style.css` 的 `:root[data-theme="nasapunk"]{}` | NASA-punk 的令牌块（设备白 `#ECE5D6`、身份四色 `#4C5A68 #7A7F4E #D2A85E #A8432F`、唯一鲜色 `#D63A2C`）+ 机身线条：彩条、警示斜纹、接缝铆钉、角螺丝、卡片双细线、痕迹覆盖层 |
+| `skills/dorothy-html/assets/src/style.css` 的 `.np-chrome` | 装饰件常驻 DOM：孤星下 `display:none`（不占排布），NASA-punk 下 `display:contents` 并按 34ms 级联淡入 |
+| `skills/dorothy-html/assets/src/app.js` 的主题模块 | `setTheme()`：加 `.is-theming` → 强制重排 → 换 `data-theme` → rAF 驱动百分比进度条 → 驻留 240ms 后淡出；`localStorage['dorothy:theme']` 记忆，`try/catch` 兜底 |
 
 **只改线条和配色。** 主题块里没有任何字体相关的覆盖（`font-family`、`font-size`、`letter-spacing`、`text-transform`、`font-style`、`line-height` 都没有），字体沿用基础样式的 Times New Roman + 霞鹜文楷 + NoteMath + Consolas。回归验证过：切换前的 NASA-punk 单主题产物和现在的双主题产物，核心概念与易错点两段**逐字相同**（113506 字符），3 张插图与知识地图 SVG 也逐字相同。
 
@@ -340,17 +340,17 @@ NASA-punk 已经**收进基础样式**，作为第二套令牌存在，不再是
 
 ```bash
 # 列出页面里的所有图
-node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08.html --list
+node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08-概率论基础-卡片版.html --list
 
 # 渲染某张图核对（可选 --theme nasapunk 看深色主题）
-node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08.html --id fig-5-chord --out out.png
+node skills/dorothy-picture/scripts/render_fig.js --html beta/ch08-概率论基础-卡片版.html --id fig-9-density-band --out out.png
 
 # 导出脱离宿主页的自包含 SVG（token 已烘焙成具体色值）
-node skills/dorothy-picture/scripts/render_fig.js --figure beta/figs/fig-5-chord.html --css beta/_style.css --out fig.svg --bake
+node skills/dorothy-picture/scripts/render_fig.js --figure skills/dorothy-picture/assets/sample-figure.html --css skills/dorothy-html/assets/src/style.css --out fig.svg --bake
 
 # 校验
-python skills/dorothy-picture/scripts/check_figure.py beta/figs/*.html
-python skills/dorothy-picture/scripts/check_plan.py beta/ch08_figures-plan.md --html beta/ch08.html
+python skills/dorothy-picture/scripts/check_figure.py skills/dorothy-picture/assets/sample-figure.html
+python skills/dorothy-picture/scripts/check_plan.py beta/ch08-概率论基础_figures-plan.md --html beta/ch08-概率论基础-卡片版.html
 ```
 
 ## 与 dorothy-html 的关系

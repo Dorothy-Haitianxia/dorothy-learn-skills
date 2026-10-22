@@ -34,7 +34,9 @@ __pycache__/
 # 参考教材原图（第三方教材截图，仅本地留存，不入库）
 参考教材 报告/
 
-# 教材衍生内容：第三方教材的逐句翻译正文与章末习题，仅本地留存
-beta/_source.html
-beta/_exercises.html
-beta/ch08-概率论基础*.html
+# 教材衍生内容：第三方教材的逐句翻译、章末习题、教学稿、图示与版本快照
+# 整个 beta/ 都是本地试点工作区，一律不入库（样式源已移入 skills/dorothy-html/assets/src/）
+beta/
+
+# 探针 / 临时审计脚本
+.tmp_asar_probe/

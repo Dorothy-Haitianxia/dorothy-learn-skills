@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-"""把 beta 版的设计与交互层搬进 skill 模板（内容换成占位骨架）。"""
+"""把 assets/src 的设计与交互层合成 skill 模板（内容换成占位骨架）。
+
+样式与交互层的唯一源是 assets/src/style.css 与 assets/src/app.js —— 它们住在 skill 里，
+所以本脚本不依赖仓库外的任何目录（clone 到任何地方都能跑）。
+"""
 import pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]   # 仓库根（可移植）
-BETA = ROOT / "beta"
-SKILL = ROOT / "skills" / "dorothy-html"
+SKILL = pathlib.Path(__file__).resolve().parents[1]   # skills/dorothy-html
+SRC = SKILL / "assets" / "src"
 
-CSS = (BETA / "_style.css").read_text(encoding="utf-8")
-JS = (BETA / "_app.js").read_text(encoding="utf-8")
+CSS = (SRC / "style.css").read_text(encoding="utf-8")
+JS = (SRC / "app.js").read_text(encoding="utf-8")
 
 MAP_SVG = '''<svg id="mapSvg" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet" role="img" aria-label="本章知识点关系图">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9" fill="none" class="f-arrowline"/></marker></defs>

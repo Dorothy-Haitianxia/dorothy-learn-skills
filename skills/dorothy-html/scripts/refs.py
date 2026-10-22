@@ -18,9 +18,8 @@ import re
 import sys
 from collections import defaultdict
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]   # 仓库根（可移植）
-# 默认示例产物；该文件含教材衍生内容，不入库，需在本地用你自己的材料生成
-HTML_PATH = ROOT / "beta" / "ch08-概率论基础.html"
+# 不设默认路径：产物在哪儿只有调用方知道（产物含教材衍生内容，一律不入库）
+HTML_PATH = None
 
 # ── 别名表：(目标卡, 术语（纯文本形态）, 是否正则, 备注) ──────────────────
 ALIASES = [
@@ -308,7 +307,7 @@ def mark_block(block):
 def write_report(cards, marks, suppressed, excluded, foreign, path):
     order = {c["id"]: n for n, c in enumerate(cards)}
     title = {c["id"]: c["title"] for c in cards}
-    out = ['# 核心概念互引 · 标记清单（已写入 beta/ch08-概率论基础.html）\n',
+    out = ['# 核心概念互引 · 标记清单（已写入页面）\n',
            '规则：只在核心概念区的展开内容里标记；目标可以是任何更早的卡；',
            '同一张卡里同一目标只标最早一处；出处行与插图 SVG 内不标；基础通用词不标。\n',
            '\n## 一、别名表\n', '| 目标卡 | 术语 | 类型 | 备注 |', '|---|---|---|---|']
@@ -359,10 +358,10 @@ def core_section(html):
 
 def main(argv):
     path = HTML_PATH
-    if not argv and not path.exists():
-        raise SystemExit(__doc__)
     if '--file' in argv:
         path = pathlib.Path(argv[argv.index('--file') + 1]).resolve()
+    elif path is None:
+        raise SystemExit(__doc__)
     raw = path.read_text(encoding="utf-8")
 
     if '--apply' in argv:

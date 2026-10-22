@@ -147,14 +147,14 @@ cd dorothy-learn-skills/skills/dorothy-picture
 pnpm install --ignore-scripts     # 装 @resvg/resvg-js 与平台包
 node -e "console.log(typeof require('@resvg/resvg-js').Resvg)"   # 应输出 function
 
-# 用现成的 8 个片段做一次渲染回归（片段在 repo 根的 beta/figs/）
-node scripts/render_fig.js --figure ../../beta/figs/fig-5-chord.html --css ../../beta/_style.css --out out-chord.png
+# 用自带的样例片段做一次渲染回归（assets/sample-figure.html，不含任何教材内容）
+node scripts/render_fig.js --figure assets/sample-figure.html --css ../dorothy-html/assets/src/style.css --out out-sample.png
 
 # 换主题再渲一次，确认令牌生效
-node scripts/render_fig.js --figure ../../beta/figs/fig-5-chord.html --css ../../beta/_style.css --theme nasapunk --out out-chord-nasa.png
+node scripts/render_fig.js --figure assets/sample-figure.html --css ../dorothy-html/assets/src/style.css --theme nasapunk --out out-sample-nasa.png
 
-# 校验片段
-python scripts/check_figure.py ../../beta/figs/*.html
+# 校验片段（自带样例 + 你自己的 figs/*.html）
+python scripts/check_figure.py assets/sample-figure.html
 ```
 
 看到 `out-chord*.png` 里两条密度曲线、竖线、色带都在（不是只剩圆点和文字），说明环境是对的 —— 只剩圆点与文字就是第 6 节第 2 条的 CSS 拼接 bug 复现。

@@ -3,7 +3,7 @@
 """check_teaching.py — 校验教学稿是否符合 reference/teaching-contract.md
 
 用法：
-    python scripts/check_teaching.py beta/ch08-概率论基础_teaching.md
+    python scripts/check_teaching.py <产物>_teaching.md
     python scripts/check_teaching.py <教学稿> --html <页面> --plan <清单>
 
 退出码：0 全部通过；1 有错误。

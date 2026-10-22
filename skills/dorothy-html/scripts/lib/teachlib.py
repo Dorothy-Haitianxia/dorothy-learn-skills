@@ -4,7 +4,6 @@
 契约见 skills/dorothy-html/reference/teaching-contract.md。
 本模块只做纯函数：所有入口都显式接教学稿路径，不持有全局状态。
   - scripts/inject_teaching.py 用它把教学稿机械地填进卡片
-  - 工作目录 beta/_teach.py 是它的薄壳（固定本仓库那一章的路径）
 
 解析失败一律抛异常：宁可构建失败，也不要静默生成一份缺图说的页面。
 """

@@ -25,7 +25,7 @@ description: "全局 skill：把任意科目的某章课本正文（含课本章
 
 - 文件名 `chXX-章节名.html`，放在科目工作区。
 - **单文件**：CSS/JS 内联，不引外部图片、字体、脚本；字体只用系统字体栈 + 本机 `local()` 兜底。
-- 模板：`assets/note-template.html`。复制它，只改 `<body>` 内容；`<style>` 的令牌区与 `<script>` 的交互层照用。模板由 `scripts/build_template.py` 从工作目录的 `beta/_style.css` 与 `beta/_app.js` 生成（教学层样式已并入 `beta/_style.css`，所以模板默认就带 `.tk-*` 全套）。
+- 模板：`assets/note-template.html`。复制它，只改 `<body>` 内容；`<style>` 的令牌区与 `<script>` 的交互层照用。模板由 `scripts/build_template.py` 从 `assets/src/style.css` 与 `assets/src/app.js` 生成（样式与交互层的**唯一源就在 skill 里**，clone 到任何地方都能重建；教学层样式在 `style.css` 内，所以模板默认就带 `.tk-*` 全套）。
 
 ## 三、页面结构（五页 + 一个浮层）
 
